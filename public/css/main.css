@@ -1,0 +1,321 @@
+html {
+	height: 100%;
+	width: 100%;
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+header {
+  top: 0;
+  left: 0;
+  right: 0;
+  display: block;
+  text-align: center;
+  padding: 35px;
+}
+.appTitle{
+  background-color: white;
+  border-radius: 5px;
+  color: #969595;
+
+  font: 100 20px/1.0 'Just Another Hand', Helvetica, sans-serif;
+  text-shadow: 2px 2px 0px rgba(0,0,0,0.1); 
+  padding: 15px;
+  margin: 5px 15px;
+}
+ 
+.box{
+  margin: auto;
+  width: 300px;
+  height: 50px;
+}
+.search-container{
+  /* overflow: hidden; */
+  /*margin-left: -50px; */
+  width: 250px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.search-container input#searchbar{
+  width: 250px;
+  height: 50px;
+  background: #2b303b;
+  border: none;
+  font-size: 15pt;
+  float: left;
+  color: #fff;
+  padding-left: 15px;
+  -webkit-border-radius: 5px 0px 0px 5px;
+  -moz-border-radius: 5px 0px 0px 5px;
+  border-radius: 5px 0px 0px 5px;
+  outline: none;
+}
+.search-container input#searchbar::-webkit-input-placeholder {
+   color: #65737e;
+}
+ 
+.search-container4 input#searchbar:-moz-placeholder { /* Firefox 18- */
+   color: #65737e;  
+}
+ 
+.search-container input#searchbar::-moz-placeholder {  /* Firefox 19+ */
+   color: #65737e;  
+}
+ 
+.search-container input#searchbar:-ms-input-placeholder {  
+   color: #65737e;  
+}
+.search-container button.icon{
+  -webkit-border-top-right-radius: 5px;
+  -webkit-border-bottom-right-radius: 5px;
+  -moz-border-radius-topright: 5px;
+  -moz-border-radius-bottomright: 5px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+ 
+  border: none;
+  background: black;
+  height: 50px;
+  width: 50px;
+  color: #4f5b66;
+  font-size: 10pt;
+}
+.search-container:hover button.icon, .search-container:active button.icon, .search-container:focus button.icon{
+  outline: none;
+  /*opacity: 1;*/
+  /* margin-left: -50px; */
+}
+ 
+.search-container:hover button.icon:hover{
+    background: white;
+  }
+
+.description{
+  border-radius: 4px;
+  background: rgb(54, 25, 25); /* Fall-back for browsers that don't
+                                  support rgba */
+  background: rgba(54, 25, 25, .5);
+  stroke-opacity: 0.3;
+}
+
+.prospective-description{
+  border-radius: 4px;
+  background: rgb(153, 153, 255); /* Fall-back for browsers that don't
+                                  support rgba */
+  background: rgba(153, 153, 255, .5);
+  stroke-opacity: 0.3;
+}
+.prospective-description .grid-content-text{
+  font-size: 14px;
+}
+.prospective-description .grid-content-text a{
+  color: white;
+}
+.prospective-description .grid-content-text a:hover{
+  color: purple;
+}
+
+.movie-result-container, .movie-review-container, .movie-source-container {
+  display: none;
+  border-radius: 4px;
+  background: rgb(54, 25, 25); /* Fall-back for browsers that don't
+                                  support rgba */
+  background: rgba(54, 25, 25, .5);
+  stroke-opacity: 0.3;
+}
+.js-movie-thumbnail {
+    border: 3px solid darkgoldenrod;
+    border-radius: 5px;
+}
+.movieTitle{
+  color: white;
+}
+.movie-result-container .js-movie-thumbnail {
+    cursor: pointer;
+}
+#movie-trailer-button button.icon{
+  cursor: pointer;
+}
+.js-source-thumbnail {
+    width: 136px;
+    border: 3px solid silver;
+    border-radius: 5px;
+}
+.platforms{
+  margin: 0 auto;
+  width: 136px;
+  overflow: hidden;
+  vertical-align: top;
+  text-align: center;
+}
+.platforms a {
+    -webkit-transition: all 0.2s ease;
+    -moz-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+    background-color: #56A10E;
+    border-radius: 2px;
+    border-style: none;
+    text-decoration: none;
+    border: 1px solid #53B341;
+    color: #fdfdfd;
+    display: block;
+    font-size: 12px;
+    font-weight: 400;
+    height: 36px;
+    line-height: 36px;
+    width: 136px;
+    margin: 5px auto 10px auto;
+    padding: 0 2px;
+    white-space: nowrap;
+}
+.trailer {
+    -webkit-transition: all 0.2s ease;
+    -moz-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+    background-color: black;
+    border-radius: 5px;
+    border-style: none;
+    text-decoration: none;
+    border: 2px solid silver;
+    color: #fdfdfd;
+    display: block;
+    font-size: 14px;
+    font-weight: 400;
+    width: 136px;
+    margin: 5px auto 10px auto;
+    padding: 5px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.js-activate-thumbnail{
+  text-decoration: none;
+}
+.details{
+  font-size: 14px;
+}
+
+@media only screen and (min-width: 315px) {  
+  .box{
+    margin-top: 20px;
+    width: 200px;
+  }
+  .search-container{
+    width: 150px;
+  }
+  .search-container input#searchbar{
+    width: 150px;
+  }
+  .description{
+    margin-top: 20px;
+    padding: 10px;
+  }
+  .propsective-description{
+    margin-top: 20px;
+    padding: 10px;
+  }
+  .movie-result-container, .movie-review-container, .movie-source-container{
+    margin-top: 20px;
+    padding: 10px;
+  }
+  .movie-result-container .js-movie-thumbnail {
+    width: 60%;
+  }
+  .appTitle{
+    font: 100 40px/1.5 'Just Another Hand', Helvetica, sans-serif;
+    text-shadow: 2px 2px 0px rgba(0,0,0,0.1); 
+    padding: 10px;
+    margin: 5px 30px;
+  }
+}
+@media only screen and (min-width: 640px) {  
+  .box{
+    margin-top: 50px;
+    width: 300px;
+  }
+  .search-container{
+    width: 250px;
+  }
+  .search-container input#searchbar{
+    width: 250px;
+  }
+  .description{
+    margin-top: 100px;
+    margin-right: 50px;
+    margin-left: 50px;
+    padding: 20px;
+  }
+  .prospective-description{
+    margin-top: 100px;
+    margin-right: 50px;
+    margin-left: 50px;
+    padding: 20px;
+  }
+  .movie-result-container, .movie-review-container, .movie-source-container{
+    margin-top: 100px;
+    margin-right: 50px;
+    margin-left: 50px;
+    padding: 20px;
+  }
+  .movie-result-container .js-movie-thumbnail {
+    width: 120px;
+  }
+  .appTitle{
+    padding: 15px;
+    font: 200 50px/1.0 'Just Another Hand', Helvetica, sans-serif;
+    text-shadow: 3px 3px 0px rgba(0,0,0,0.1); 
+    margin: 5px 30px;
+  }
+}
+@media only screen and (min-width: 960px) { 
+  .box{
+    margin-top: 100px;
+    width: 300px;
+  }
+  .search-container{
+    width: 250px;
+  }
+  .search-container input#searchbar{
+    width: 250px;
+  }
+  .description{
+    margin-top: 30px;
+    margin-right: 100px;
+    margin-left: 100px;
+    padding: 30px;
+  }
+  .prospective-description{
+    margin-top: 10px;
+    margin-right: 100px;
+    margin-left: 100px;
+    padding: 20px;
+  }
+  .movie-result-container, .movie-review-container, .movie-source-container{
+    margin-top: 100px;
+    margin-right: 100px;
+    margin-left: 100px;
+    padding: 50px;
+  }
+  .movie-result-container .js-movie-thumbnail {
+    width: 150px;
+  }
+  .appTitle{
+    border-radius: 5px;
+    font: 300 60px/1.0 'Just Another Hand', Helvetica, sans-serif;
+    text-shadow: 4px 4px 0px rgba(0,0,0,0.1); 
+    margin: 5px 30px;
+  }
+}
+
+/*Video css*/
+.fancybox-slide--video .fancybox-content {
+	width  : 640px;
+	height : 360px;
+}
+.fancybox-slide--iframe .fancybox-content {
+	width  : 640px;
+	height : 360px;
+	margin: 0;
+}
