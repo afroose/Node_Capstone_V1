@@ -17,7 +17,7 @@ describe('index',function() {
     return closeServer();
   });
 
-  it('should return status 200 if index.html exists', function() {
+  it('test index.html - Ateev', function() {
     return chai.request(app)
       .get('/')
       .then(function(res) {
