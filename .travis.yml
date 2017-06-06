@@ -3,3 +3,10 @@ node_js: node
 services: mongodb
 scripts: 
  - npm test
+deploy:
+  provider: heroku
+  api_key: 
+    secure: b98505ec-78c8-4480-b0f8-fbaa5f1bf062
+  app: polar-river-42993
+  on:
+    repo: afroose/Node_Capstone_V1 
