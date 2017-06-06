@@ -22,14 +22,14 @@ router.get('/dish', (req,res) => {
     });
 })
 
-// router.post('/dish', (req, res) => {
-//   Dishid
-//     .create({
-//       name: req.body.name
-//     })
-//     .then(
-//       dishes => res.status(201).json(dishes)
-//     )
-// })
+router.post('/dish', (req, res) => {
+  Dishid
+    .create({
+      name: req.body.name
+    })
+    .then(
+      dishes => res.status(201).json(dishes)
+    )
+})
 
 module.exports = router;
