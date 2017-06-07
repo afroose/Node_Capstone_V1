@@ -5,7 +5,7 @@ const express = require('express');
 const jsonParser = require('body-parser').json();
 const path = require('path');
 
-const {Dishid} = require('../models/dishModels');
+const {Dishids} = require('../models/dishModels');
 //import Dishid from '../models/dishModels';
 
 const router = express.Router();
@@ -14,7 +14,7 @@ router.use(jsonParser);
 // Get endpoint
 
 router.get('/dish', (req,res) => {
-  Dishid
+  Dishids
     .find()
     .exec()
     .then(dishes => {
@@ -23,7 +23,7 @@ router.get('/dish', (req,res) => {
 })
 
 router.post('/dish', (req, res) => {
-  Dishid
+  Dishids
     .create({
       name: req.body.name
     })

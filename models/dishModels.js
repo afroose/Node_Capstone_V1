@@ -7,6 +7,6 @@ const dishSchema = mongoose.Schema({
 
 // note that all instance methods and virtual properties on our
 // schema must be defined *before* we make the call to `.model`.
-const Dishid = mongoose.model('Dishid', dishSchema);
+const Dishids = mongoose.model('Dishids', dishSchema);
 
-module.exports = {Dishid};
+module.exports = {Dishids};
