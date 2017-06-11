@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 // this is our schema to represent a location (school/cafeteria/restaurant)
 const locationSchema = mongoose.Schema({
-  name: {type: String, required: true},
+  locationName: {type: String, required: true},
   address: {
     city: String,
     building: String,
@@ -11,7 +11,8 @@ const locationSchema = mongoose.Schema({
     zipcode: String,
     // coord will be an array of string values
     coord: [String]
-  }
+  },
+  dishes: [{type: mongoose.Schema.Types.ObjectId, ref: 'Dishids' }]
 });
 
 // note that all instance methods and virtual properties on our

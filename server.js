@@ -14,6 +14,9 @@ const loginRouter = require('./routes/loginRouter');
 const dishRouter = require('./routes/dishRouter');
 const locationRouter = require('./routes/locationRouter');
 
+// Call connection routers
+const menuConnectRouter = require('./routes/menuConnectRouter');
+
 // Mongoose internally uses a promise-like object,
 // but its better to make Mongoose use built in es6 promises
 mongoose.Promise = global.Promise;
@@ -34,8 +37,10 @@ app.use(cookieParser());
 
 // define routers
 app.use('/', loginRouter);
-app.use('/', dishRouter);
+app.use('/dish', dishRouter);
 app.use('/', locationRouter);
+
+app.use('/', menuConnectRouter);
 
 // closeServer needs access to a server object, but that only
 // gets created when `runServer` runs, so we declare `server` here
