@@ -11,8 +11,7 @@ const locationSchema = mongoose.Schema({
     zipcode: String,
     // coord will be an array of string values
     coord: [String]
-  },
-  dishes: [{type: mongoose.Schema.Types.ObjectId, ref: 'Dishids' }]
+  }
 });
 
 // note that all instance methods and virtual properties on our

@@ -3,8 +3,7 @@ const mongoose = require('mongoose');
 // this is our schema to represent a dish in the menus
 const dishSchema = mongoose.Schema({
   dishname: {type: String, required: true},
-  content: {type: String},
-  locations: [{type: mongoose.Schema.Types.ObjectId, ref: 'Locationid' }]
+  content: {type: String}
 });
 
 // note that all instance methods and virtual properties on our
