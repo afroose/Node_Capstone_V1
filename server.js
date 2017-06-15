@@ -29,6 +29,7 @@ const app = express();
 // logging
 app.use(morgan('common'));
 app.use(express.static('public'));
+app.use(express.static('views'));
 
 // BodyParser Middleware
 app.use(bodyParser.json());
@@ -38,9 +39,9 @@ app.use(cookieParser());
 // define routers
 app.use('/', loginRouter);
 app.use('/dish', dishRouter);
-app.use('/', locationRouter);
+app.use('/location', locationRouter);
 
-app.use('/', menuConnectRouter);
+app.use('/menu', menuConnectRouter);
 
 // closeServer needs access to a server object, but that only
 // gets created when `runServer` runs, so we declare `server` here

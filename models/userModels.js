@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const userInfoSchema = mongoose.Schema({
   email: {type: String, required: true},
   user_password: {type: String, required: true},
-  role: {type: String, required: true}, // admin / patron / parent / student  
+  role: {type: String}, // admin / patron / parent / student  
   name: {
     firstName: String,
     lastName: String
@@ -20,7 +20,7 @@ const userInfoSchema = mongoose.Schema({
     fish: false,
     shellfish: false
   },
-  location_id: {type: String, required: true}
+  location_id: {type: String}
 });
 
 userInfoSchema.methods.validatePassword = function(password) {

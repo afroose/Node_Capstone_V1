@@ -60,7 +60,7 @@ const requireLogin = (req,res,next) => {
 router.use(checkUserCookie) 
 
 
-// Users PAGE - sho all users - do not use in production
+// Users PAGE - show all users - do not use in production
 
 router.get('/users', (req,res) => {
     Userid

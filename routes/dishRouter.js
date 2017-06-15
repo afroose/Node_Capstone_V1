@@ -33,7 +33,7 @@ router.get('/:dishname', (req, res) => {
     .then(dishes =>res.json(dishes))
     .catch(err => {
       console.error(err);
-        res.status(404).json({message: 'Dish ID Not Found'})
+        res.status(404).json({message: 'Dish Name Not Found'})
     });
 });
 

@@ -11,22 +11,8 @@ const {MenuConnectid} = require('../models/menuConnectModels');
 const router = express.Router();
 router.use(jsonParser);
 
-// Get endpoint
-router.get('/menu', (req,res) => {
-  MenuConnectid
-    .find()
-    .exec()
-    .then(menuItem => {
-      res.json(menuItem);
-    })
-    .catch(err => {
-      console.error(err);
-        res.status(500).json({message: 'Internal server error - GET Connection - menu/location'})
-    });
-});
-
 // POST endpoint
-router.post('/menu', (req, res) => {
+router.post('/', (req, res) => {
   const requiredFields = ['dishes', 'location'];
   for (let i=0; i<requiredFields.length; i++) {
     const field = requiredFields[i];
@@ -53,13 +39,51 @@ router.post('/menu', (req, res) => {
 
 // populate
 
-router.get('/checkMenu', (req,res) => {
+router.get('/', (req,res) => {
   MenuConnectid
     .find()
     .populate('dishes')
     .populate('location')
     .exec()
     .then(dishByLocation => res.json(dishByLocation))
+});
+
+// PUT endpoint - 1 updateable field - description - example: http://localhost:8080/dish/593875abd0db4334c433cbd7
+router.put('/:id', (req, res) => {
+  // ensure that the id in the request path and the one in request body match
+  if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
+    const message = (
+      `Request path id (${req.params.id}) and request body id ` +
+      `(${req.body.id}) must match`);
+    console.error(message);
+    res.status(400).json({message: message});
+  }
+
+  const toUpdate = {};
+  const updateableFields = ['dishes', 'location'];
+
+  updateableFields.forEach(field => {
+    if (field in req.body) {
+      toUpdate[field] = req.body[field];
+    }
+  });
+
+  MenuConnectid
+    // all key/value pairs in toUpdate will be updated -- that's what `$set` does
+    .findByIdAndUpdate(req.params.id, {$set: toUpdate}) // find by Mongoose ID
+    .exec()
+    .then(
+      MenuConnectid => res.status(204).end())
+    .catch(err => res.status(404).json({message: 'ID not found'}));
+});
+
+// DELETE endpoint
+router.delete('/:id', (req, res) => {
+  MenuConnectid
+    .findByIdAndRemove(req.params.id)
+    .exec()
+    .then(MenuConnectid => res.status(204).end())
+    .catch(err => res.status(404).json({message: 'ID not found'}));
 });
 
 module.exports = router;
