@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>New Dish</title>
+	
+  <!-- fonts  -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+  <!-- reset -->
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.1.1/normalize.min.css">
+
+  <!-- styles -->
+  <link rel="stylesheet" type="text/css" href="styles/main.css">
+
+  <!-- your styles go in position-page.css -->
+  <link rel="stylesheet" type="text/css" href="styles/index.css">
+  
+</head>
+
+<body>
+
+<main>
+  <header>
+    
+  </header>
+  <form action="/dish" method="post">
+    <fieldset name="create-dish" class="" >
+      <h1>Create a new dish</h1>
+      <label for="dishname" required>Dish Name</label>
+      <input placeholder="Dish Name" type="text" name="dishname" id="dishname" required/>
+      <label for="content" required>Dish Content</label>
+      <input placeholder="content" type="text" name="content" id="content" required/>
+      
+      <button type='submit'>Submit</button>
+    </fieldset>
+  </form>
+  
+  <footer>
+    <!-- <img src="images/logo.png" class="logo" /> -->
+    <span class="login">Already have an account? <a href="/login">Log in</span>
+  </footer>
+</main>
+
+</body>
+</html>

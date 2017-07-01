@@ -9,12 +9,14 @@ const jsonParser = require('body-parser').json();
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const session = require('client-sessions');
+const expressValidator = require('express-validator');
 
 const {Userid} = require('../models/userModels');
 
 const router = express.Router();
 
 router.use(jsonParser);
+router.use(expressValidator());
 
 // set Sessions parameters
 
@@ -76,7 +78,7 @@ router.get('/users', (req,res) => {
         });
 })
 
-// Index page - login or signup
+// Index page - Hello World
 
 router.get('/', (req,res) => {
     res.sendFile(path.join(__dirname,"../views/index.html"));
@@ -182,20 +184,17 @@ router.post('/register', (req, res) => {
     let {email, user_password, user_password2} = req.body;
 
     // req.checkBody('email', 'Email is required').notEmpty();
-    // req.checkBody('email', 'Email is not valif').isEmail();
+    req.checkBody('email', 'Email is not valid').isEmail();
     // req.checkBody('password', 'Password is required').notEmpty();
     // req.checkBody('password2', 'Passwords do not match').equals(req.body.user_password);
 
-    // let errors = req.validationErrors();
+    let errors = req.validationErrors();
 
-    // if (errors) {
-    //     console.log('There are errors');
-    //     res.render('/register', {
-    //         error: errors
-    //     });
-    // } else {
-    //     console.log('all good - no errors')
-    // }
+    if (errors) {
+        console.log('There are errors');
+    } else {
+        console.log('all good - no errors')
+    }
 
   Userid
     .find({email}) // find user with email
@@ -208,7 +207,7 @@ router.post('/register', (req, res) => {
         }
         return Userid.hashPassword(user_password);
     })
-    .then( // users does not exist - cstore user data in database
+    .then( // users does not exist - store user data in database
 
         newPassword => {
             console.log(newPassword);
@@ -217,15 +216,27 @@ router.post('/register', (req, res) => {
                 email: email,
                 user_password: newPassword
                 })
+                // .then(
+                //     users => res.status(201).json(users) // Display user info (raw format)
+                // )
                 .then(
-                    users => res.status(201).json(users)
-                )
+                    res.sendFile(path.join(__dirname,"../views/home.html"))
+                ) 
                 .catch(err => {
                     console.error(err);
                     res.status(500).json({message: 'Internal server error'});
                 })
             }
         )
+});
+
+// DELETE endpoint
+router.delete('/users/:id', (req, res) => {
+  Userid
+    .findByIdAndRemove(req.params.id)
+    .exec()
+    .then(Userid => res.status(204).end())
+    .catch(err => res.status(404).json({message: 'ID not found'}));
 });
 
 module.exports = router;

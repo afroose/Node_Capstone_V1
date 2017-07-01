@@ -105,9 +105,9 @@ router.delete('/:id', (req, res) => {
 
 // Search - endpoint
 
-router.get('/:location', (req,res) => {
-  if (req.params.location.length > 2) {
-    const regex = new RegExp(req.params.location);
+router.get('/search', (req,res) => {
+  if (req.query.location.length > 2) {
+    const regex = new RegExp(req.query.location,'i');
     Locationid
     .find({'locationName': regex}, (err, locations) => {
       res.json(locations)
