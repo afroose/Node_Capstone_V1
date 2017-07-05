@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Add a new Location</title>
+
+  <!-- styles -->
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+	<style>
+		body 		{ padding-top:80px; }
+	</style>
+
+<script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+<script
+  src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+  integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+  crossorigin="anonymous"></script>
+  
+</head>
+
+<body>
+  <header>    
+  </header>
+
+  <div class="container">
+    <div class="col-sm-6 col-sm-offset-3">
+      <h1><span class="fa fa-pencil-square-o"></span> Add a Location</h1>
+
+      <form action="/location" method="post">
+        <div class="form-group">
+          <label for="locationName" required>Location Name</label>
+          <input class="form-control" placeholder="Location Name" type="text" name="locationName" id="locationName" required/>
+        </div>
+        <!-- address-line1 input-->
+        <div class="form-group">
+          <label for="street" required>Address Line 1</label>
+          <input class="form-control" placeholder="Address line 1" type="text" name="street" id="street" required/>
+          <p class="help-block">Street address, P.O. box, company name, c/o</p>
+        </div>
+        <div class="form-group">
+          <label for="building">Address Line 2</label>
+          <input class="form-control" placeholder="Address line 2" type="text" name="building" id="building" />
+          <p class="help-block">Apartment, suite , unit, building, floor, etc.</p>
+        </div>
+        <!-- city input-->
+        <div class="form-group">
+          <label for="city" required>City / Town</label>
+          <input class="form-control" placeholder="city" type="text" name="city" id="city" required/>
+          <p class="help-block"></p>
+        </div>
+        <!-- State input-->
+        <div class="form-group">
+          <label for="state" required>State / Province / Region</label>
+          <select class="form-control" name="state" id="state" >
+            <option value="">-- Please Select --</option>
+            <option value="al">Alabama (AL)</option>
+            <option value="ak">Alaska (AK)</option>
+            <option value="az">Arizona (AZ)</option>
+            <option value="ar">Arkansas (AR)</option>
+            <option value="ca">California (CA)</option>
+            <option value="co">Colorado (CO)</option>
+            <option value="ct">Connecticut (CT)</option>
+            <option value="de">Delaware (DE)</option>
+            <option value="dc">District of Columbia (DC)</option>
+            <option value="fl">Florida (FL)</option>
+            <option value="ga">Georgia (GA)</option>
+            <option value="hi">Hawaii (HI)</option>
+            <option value="id">Idaho (ID)</option>
+            <option value="il">Illinois (IL)</option>
+            <option value="in">Indiana (IN)</option>
+            <option value="ia">Iowa (IA)</option>
+            <option value="ks">Kansas (KS)</option>
+            <option value="ky">Kentucky (KY)</option>
+            <option value="la">Louisiana (LA)</option>
+            <option value="me">Maine (ME)</option>
+            <option value="md">Maryland (MD)</option>
+            <option value="ma">Massachusetts (MA)</option>
+            <option value="mi">Michigan (MI)</option>
+            <option value="mn">Minnesota (MN)</option>
+            <option value="ms">Mississippi (MS)</option>
+            <option value="mo">Missouri (MO)</option>
+            <option value="mt">Montana (MT)</option>
+            <option value="ne">Nebraska (NE)</option>
+            <option value="nv">Nevada (NV)</option>
+            <option value="nh">New Hampshire (NH)</option>
+            <option value="nj">New Jersey (NJ)</option>
+            <option value="nm">New Mexico (NM)</option>
+            <option value="ny">New York (NY)</option>
+            <option value="nc">North Carolina (NC)</option>
+            <option value="nd">North Dakota (ND)</option>
+            <option value="oh">Ohio (OH)</option>
+            <option value="ok">Oklahoma (OK)</option>
+            <option value="or">Oregon (OR)</option>
+            <option value="pa">Pennsylvania (PA)</option>
+            <option value="ri">Rhode Island (RI)</option>
+            <option value="sc">South Carolina (SC)</option>
+            <option value="sd">South Dakota (SD)</option>
+            <option value="tn">Tennessee (TN)</option>
+            <option value="tx">Texas (TX)</option>
+            <option value="ut">Utah (UT)</option>
+            <option value="vt">Vermont (VT)</option>
+            <option value="va">Virginia (VA)</option>
+            <option value="wa">Washington (WA)</option>
+            <option value="wv">West Virginia (WV)</option>
+            <option value="wi">Wisconsin (WI)</option>
+            <option value="wy">Wyoming (WY)</option>
+          </select>          
+          <p class="help-block"></p>
+        </div>
+        <!-- zip-code input-->
+        <div class="form-group">
+          <label for="zipcode" required>zip code</label>
+          <input class="form-control" placeholder="zip code" type="text" name="zipcode" id="zipcode" required/>
+          <p class="help-block"></p>
+        </div>
+        <div class="form-group">
+          <button type='submit' class="btn btn-warning btn-lg">Submit</button>
+        </div>
+      </form>      
+
+      <hr>
+
+      <p>Already have an account? <a href="/login">Login</a></p>
+      <p>Or go <a href="/">home</a>.</p>
+
+    </div>
+  </div>
+
+</body>
+</html>

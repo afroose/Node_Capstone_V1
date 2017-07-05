@@ -17,14 +17,14 @@
 		body 		{ padding-top:80px; }
 	</style>
 
-<script
-  src="https://code.jquery.com/jquery-3.2.1.min.js"
-  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-  crossorigin="anonymous"></script>
-<script
-  src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
-  integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
-  crossorigin="anonymous"></script>
+  <script
+    src="https://code.jquery.com/jquery-3.2.1.min.js"
+    integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+    crossorigin="anonymous"></script>
+  <script
+    src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+    integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+    crossorigin="anonymous"></script>
 
   <script>
   $( function() {
@@ -68,6 +68,7 @@
       }
     } );
     
+    
     //get a reference to the select element
     $select = $('#dishes');
     //request the JSON data and parse into the select element
@@ -102,9 +103,20 @@
           }
           else {
             $('.error').html('');
+            $.ajax({
+              url: '/menu',
+              type: 'POST',
+              data: {
+                dishes: dishToPass,
+                location: locationToPass
+              },
+              success:function(data){
+                console.log(data);
+              }
+            })
           }
       });
-  }
+    }
   // Create function to submit search terms  - callback function
 
   $(function(){
@@ -130,7 +142,7 @@
         <fieldset name="create-menu-entry" class="" >
           <div class="form-group">
             <label for="location" required>Select Location</label>
-            <input class="form-control" placeholder="location" type="text" data-id="123" name="location" id="location" required/>
+            <input class="form-control" placeholder="location" type="text" data-id="" name="location" id="location" required/>
           </div>
           <div class="form-group">
             <label for="dishes" required>Dish Name</label>

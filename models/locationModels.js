@@ -5,8 +5,8 @@ const locationSchema = mongoose.Schema({
   locationName: {type: String, required: true},
   address: {
     city: String,
-    building: String,
     street: String,
+    building: String,
     state: String,
     zipcode: String,
     // coord will be an array of string values
@@ -17,7 +17,7 @@ const locationSchema = mongoose.Schema({
 // Create virtual for address - Simplify format for readability
 
 locationSchema.virtual('addressString').get(function() {
-  return `${this.address.building} ${this.address.street}, ${this.address.city}, ${this.address.state} ${this.address.zipcode}`.trim()});
+  return `${this.address.street}, ${this.address.building}, ${this.address.city}, ${this.address.state} ${this.address.zipcode}`.trim()});
 
 // Create Instance for address - do not return coords
 locationSchema.methods.apiRepr = function() {

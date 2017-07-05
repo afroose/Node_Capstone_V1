@@ -36,7 +36,7 @@ router.get('/', (req,res) => {
 
 // POST endpoint
 router.post('/', (req, res) => {
-  const requiredFields = ['locationName', 'address'];
+  const requiredFields = ['locationName', 'street', 'city', 'state', 'zipcode'];
   for (let i=0; i<requiredFields.length; i++) {
     const field = requiredFields[i];
     if (!(field in req.body)) {
@@ -45,15 +45,18 @@ router.post('/', (req, res) => {
       return res.status(400).send(message);
     }
   }
-
+  let {locationName,street,building,city,state,zipcode} = req.body
   Locationid
     .create({
-      locationName: req.body.locationName,
-      address: req.body.address
+      locationName: locationName,
+      address:{
+        street: street,
+        building: building,
+        city: city,
+        state: state,
+        zipcode: zipcode
+      }
     })
-    .then(
-      console.log(req.body.dishname)
-    )
     .then(
         location => res.status(201).json(location.apiRepr())
     )

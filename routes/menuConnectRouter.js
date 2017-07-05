@@ -48,6 +48,24 @@ router.get('/', (req,res) => {
     .then(dishByLocation => res.json(dishByLocation))
 });
 
+// populate by location
+
+router.get('/dish', (req,res) => {
+  const filters = {}
+  const queryableFields = ['location'];
+  queryableFields.forEach(field => {
+      if (req.query[field]) {
+          filters[field] = req.query[field];
+      }
+  });
+  MenuConnectid
+    .find(filters)
+    .populate('dishes')
+    .populate('location')
+    .exec()
+    .then(dishByLocation => res.json(dishByLocation))
+});
+
 // PUT endpoint - 1 updateable field - description - example: http://localhost:8080/dish/593875abd0db4334c433cbd7
 router.put('/:id', (req, res) => {
   // ensure that the id in the request path and the one in request body match

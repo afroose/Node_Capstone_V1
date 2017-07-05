@@ -2,19 +2,112 @@
 <!doctype html>
 <html>
 <head>
-	<title>Node Authentication</title>
+	<title>Registration</title>
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+  <link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.12.1/themes/blitzer/jquery-ui.css">
 	<style>
 		body 		{ padding-top:80px; }
 	</style>
+
+	<script
+		src="https://code.jquery.com/jquery-3.2.1.min.js"
+		integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+		crossorigin="anonymous"></script>
+	<script
+		src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+		integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+		crossorigin="anonymous"></script>
+		
+  <script>
+  $( function() {
+ 
+    $( "#location" ).autocomplete({
+      source: function( request, response ) {
+        $.ajax( {
+          url: "/location/search",
+          data: {
+            location: request.term
+          },
+          success: function( data ) {
+            response($.map(data, function (el) {
+              console.log(el.locationName," - ",el._id)
+              return {
+                  label: el.locationName,
+                  value: el._id
+              	};
+              }));
+            }
+        });
+      },
+      minLength: 3,
+      focus: function (event, ui) { 
+        this.value = ui.item.label; 
+        console.log("location field id: ", this.value);
+        // Prevent other event from not being execute
+        event.preventDefault();
+      },
+      select: function (event, ui) {
+        console.log( "Selected: " + ui.item.value + " aka " + ui.item.label );
+        // Prevent value from being put in the input:
+        $(this).data('id',ui.item.value);
+        this.value = ui.item.label;
+        // Set the id to the next input hidden field
+          //$(this).next("input").val(ui.item.value); 
+        // Prevent other event from being executed
+        event.preventDefault();
+        // optional: submit the form after field has been filled up
+        // $('#quicksearch').submit();
+      }
+    } );
+  } );
+
+  function watchSubmit() { // pass argument from form
+      $('.js-register-form').submit(function(event){
+          event.preventDefault(); 
+					var email = $('#email').val();
+					var user_password = $('#user_password').val();
+					var user_password2 = $('#user_password2').val();
+					var firstName = $('#firstName').val();
+					var lastName = $('#lastName').val();
+
+          var locationToPass = $(this).find('#location').data('id');  
+          console.log("location ID: ", locationToPass);
+          if ( typeof locationToPass === "undefined") {
+            $('.error').html('Please select a valid location');
+          }
+          else {
+            $('.error').html('');
+            $.ajax({
+              url: '/register',
+              type: 'POST',
+              data: {
+                email: email,
+                user_password: user_password,
+                user_password2: user_password2,
+                location: locationToPass,
+								firstName: firstName,
+								lastName: lastName
+              },
+              success:function(data){
+                console.log(data);
+              }
+            })
+          }
+      });
+    }
+  // Create function to submit search terms  - callback function
+
+  $(function(){
+      watchSubmit();
+  });    
+  </script>
+
 </head>
 <body>
 <div class="container">
 
 <div class="col-sm-6 col-sm-offset-3">
-
-	<h1><span class="fa fa-sign-in"></span> Signup</h1>
 
 	<!-- show any messages that come back with authentication -->
 	<!--<% if (message.length > 0) { %>
@@ -22,18 +115,52 @@
 	<% } %>-->
 
 	<!-- LOGIN FORM -->
-	<form action="/register" method="post">
+	<form action="/register" method="post" class="js-register-form">
+
+	<h1><span class="fa fa-sign-in"></span> Signup</h1>
+
 		<div class="form-group">
 			<label>Email</label>
-			<input type="text" class="form-control" name="email">
+			<input type="text" class="form-control" placeholder="Enter Email address" name="email" id="email">
 		</div>
 		<div class="form-group">
 			<label>Password</label>
-			<input type="password" class="form-control" placeholder="Password" name="user_password">
+			<input type="password" class="form-control" placeholder="Password" name="user_password" id="user_password">
 		</div>
 		<div class="form-group">
 			<label>Confirm Password</label>
-			<input type="password" class="form-control" placeholder="Password" name="user_password2">
+			<input type="password" class="form-control" placeholder="Password" name="user_password2" id="user_password2">
+		</div>
+
+	<h1><span class="fa fa-users"></span> Personal Information</h1>
+
+		<div class="form-group">
+			<label for="firstName" required>First Name</label>
+			<input class="form-control" placeholder="First Name" type="text" name="firstName" id="firstName" required/>
+		</div>
+		<div class="form-group">
+			<label for="lastName" required>Last Name</label>
+			<input class="form-control" placeholder="Last Name" type="text" name="lastName" id="lastName" required/>
+		</div>
+
+		<div class="form-group">
+			<label for="allergens" required>Allergens</label>
+			<select class="form-control" placeholder="Allergens" type="text" name="allergens" id="allergens" required/>
+				<option value="">-- Please Select --</option>
+				<option value="milk">Milk</option>
+				<option value="soy">Soy</option>
+				<option value="egg">Egg</option>
+				<option value="wheat">Wheat</option>
+				<option value="peanut">Peanut</option>
+				<option value="tree_nut">Tree Nut</option>
+				<option value="fish">Fish</option>
+				<option value="shellfish">Shellfish</option>
+			</select>
+		</div>
+
+		<div class="form-group">
+			<label for="location" required>Location</label>
+			<input class="form-control" placeholder="location" type="text" data-id="" name="location" id="location" required/>
 		</div>
 
 		<button type="submit" class="btn btn-warning btn-lg">Signup</button>

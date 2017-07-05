@@ -181,7 +181,7 @@ router.post('/register', (req, res) => {
 
 //  Validation
 
-    let {email, user_password, user_password2} = req.body;
+    let {email, user_password, user_password2, firstName, lastName, location} = req.body;
 
     // req.checkBody('email', 'Email is required').notEmpty();
     req.checkBody('email', 'Email is not valid').isEmail();
@@ -214,7 +214,12 @@ router.post('/register', (req, res) => {
             Userid 
                 .create({
                 email: email,
-                user_password: newPassword
+                user_password: newPassword,
+                location_id: location,
+                name: {
+                    firstName: firstName,
+                    lastName: lastName
+                    }
                 })
                 // .then(
                 //     users => res.status(201).json(users) // Display user info (raw format)

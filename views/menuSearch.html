@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Menu Search</title>
+	
+  <!-- fonts  -->
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+  <!-- reset -->
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.1.1/normalize.min.css">
+
+  <!-- styles -->
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+  <link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.12.1/themes/blitzer/jquery-ui.css">
+	<style>
+		body 		{ padding-top:80px; }
+	</style>
+
+  <script
+    src="https://code.jquery.com/jquery-3.2.1.min.js"
+    integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+    crossorigin="anonymous"></script>
+  <script
+    src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+    integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+    crossorigin="anonymous"></script>
+
+  <script>
+  $( function() {
+
+    var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
+
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : sParameterName[1];
+            }
+        }
+    };   
+    var findLocation = getUrlParameter('location');
+    console.log(findLocation); 
+    
+    
+    //get a reference to the select element
+    //$fill = $('.dish-result-container');
+    //request the JSON data and parse into the select element
+    $.ajax({
+      url: `/menu/dish?location=${findLocation}`,
+      dataType:'JSON',
+      success:function(data){
+        // Clean containers if previous entry
+        // $( '.dish-result-container' ).empty();
+        //iterate over the data
+        let formattedTextElement = '';
+        let resultElement = '';
+        $.each(data, function(key, val){
+          console.log(val);
+          resultElement += `<p>${val.dishes[0].dishname}</p>`;          
+          console.log(resultElement);
+        })
+        $('.dish-result').prepend(`${resultElement}`);
+        //$('.dish-result-container').toggle();
+      },
+      error:function(){      }
+    });
+  } ); 
+  </script>
+
+</head>
+
+<body>
+
+<main>
+  <header>
+    
+  </header>
+ 
+
+  <div class="container">
+    <div class="col-sm-6 col-sm-offset-3">
+      <h1><span class="fa fa-list"></span> Available dishes</h1>
+
+        <div class="dish-result-container">
+          <div class="dish-result">
+            <p>Where the dishes go</p>
+          </div>
+        </div>
+      <div class='error'></div>
+
+      <hr>
+
+      <p>Already have an account? <a href="/login">Login</a></p>
+      <p>Or go <a href="/">home</a>.</p>
+
+    </div>
+  </div>
+
+</main>
+</body>
+</html>
