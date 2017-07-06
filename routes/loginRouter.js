@@ -98,7 +98,7 @@ router.post('/login', (req, res) => {
         if (!user) {
             console.log("no user");
             const message = `This user name does not exist`;
-            // res.sendFile(path.join(__dirname,"../views/login.html"));
+            //res.redirect(`/login?error=${message}`);
             return res.status(409).send(message);
         }
         else {
@@ -108,8 +108,8 @@ router.post('/login', (req, res) => {
                 console.log(passwordCheck);
                 if (passwordCheck === false) {
                     const message = `Incorrect password`
-                    res.sendFile(path.join(__dirname,"../views/login.html"));
-                    // return res.status(409).send(message);
+                    // res.sendFile(path.join(__dirname,"../views/login.html"));
+                    return res.status(403).send(message);
                 }
                 else {
                     // sets a cookie with the user's info

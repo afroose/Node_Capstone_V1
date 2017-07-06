@@ -7,17 +7,54 @@
 		<style>
 			body 		{ padding-top:80px; }
 		</style>		
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.min.js"
+      integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+      crossorigin="anonymous"></script>
+
 		
 		<script>
+    $( function() {
 
-		function watchSubmit() { // pass argument from form
-				$('.js-login-form').submit(function(event){
-				});
-			}
+      var getUrlParameter = function getUrlParameter(sParam) {
+          var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+              sURLVariables = sPageURL.split('&'),
+              sParameterName,
+              i;
 
-		$(function(){
-				watchSubmit();
-		});    
+          for (i = 0; i < sURLVariables.length; i++) {
+              sParameterName = sURLVariables[i].split('=');
+
+              if (sParameterName[0] === sParam) {
+                  return sParameterName[1] === undefined ? true : sParameterName[1];
+              }
+          }
+      };   
+      var findError = getUrlParameter('error');
+      console.log(findError); 
+			$('.error').html(findError);
+		});
+
+		$("#login-form").on("submit", loginUser)
+
+    function loginUser(event) { // pass argument from form
+			event.preventDefault();
+			//$('.error').html('');
+			var email = $('#email').val();
+			var user_password = $('#user_password').val();
+			$.ajax({
+				url: '/login',
+				type: 'POST',
+				data: {
+					email: email,
+					user_password: user_password
+				},
+				error:function(data){                
+					//$('.error').html(data); 
+					console.log(`This is ${data}`);
+				}
+			})
+      }
 		</script>
 
 	</head>
@@ -28,14 +65,15 @@
 				<h1><span class="fa fa-sign-in"></span> Login</h1>
 				
 				<!-- LOGIN FORM -->
-				<form action="/login" method="post">
+				<!--<form action="/login" method="post" /> use for  method 1 - redirect -->
+				<form id="login-form" />
 					<div class="form-group">
 						<label>Email</label>
-						<input type="text" class="form-control" name="email">
+						<input type="text" class="form-control" name="email" id="email">
 					</div>
 					<div class="form-group">
 						<label>Password</label>
-						<input type="password" class="form-control" name="user_password">
+						<input type="password" class="form-control" name="user_password" id="user_password">
 					</div>
           <div class='error'></div>
 
