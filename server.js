@@ -1,13 +1,11 @@
 const bodyParser = require('body-parser');
 const express = require('express');
 const mongoose = require('mongoose');
-const morgan = require('morgan');
 const path = require('path');
 const bcrypt = require('bcryptjs');
-const passport = require('passport');
-const flash = require('connect-flash');
 const cookieParser = require('cookie-parser');
 const expressValidator = require('express-validator');
+const flash = require('connect-flash'); // test messages
 
 // Call routers - 
 const loginRouter = require('./routes/loginRouter');
@@ -17,17 +15,12 @@ const locationRouter = require('./routes/locationRouter');
 // Call connection routers
 const menuConnectRouter = require('./routes/menuConnectRouter');
 
-// Mongoose internally uses a promise-like object,
-// but its better to make Mongoose use built in es6 promises
 mongoose.Promise = global.Promise;
 
-// config.js is where we control constants for entire
-// app like PORT and DATABASE_URL
 const {PORT, DATABASE_URL} = require('./config/config');
 
 const app = express();
-// logging
-app.use(morgan('common'));
+
 app.use(express.static('public'));
 app.use(express.static('views'));
 
@@ -43,11 +36,7 @@ app.use('/location', locationRouter);
 
 app.use('/menu', menuConnectRouter);
 
-// closeServer needs access to a server object, but that only
-// gets created when `runServer` runs, so we declare `server` here
-// and then assign a value to it in run
 let server;
-
 // this function connects to our database, then starts the server
 function runServer(databaseUrl=DATABASE_URL, port=PORT) {
 
@@ -68,8 +57,7 @@ function runServer(databaseUrl=DATABASE_URL, port=PORT) {
   });
 }
 
-// this function closes the server, and returns a promise. we'll
-// use it in our integration tests later.
+// this function closes the server, and returns a promise. 
 function closeServer() {
   return mongoose.disconnect().then(() => {
      return new Promise((resolve, reject) => {

@@ -2,12 +2,12 @@ const mongoose = require('mongoose');
 
 // this is our schema to represent a dish in the menus
 const dishSchema = mongoose.Schema({
-  dishname: {type: String, required: true},
-  content: {type: String}
+  dishName: {type: String, required: true},
+  dishDescription: {type: String}
 });
 
 // note that all instance methods and virtual properties on our
 // schema must be defined *before* we make the call to `.model`.
-const Dishids = mongoose.model('Dishids', dishSchema);
+const dishId = mongoose.model('dishId', dishSchema);
 
-module.exports = {Dishids};
+module.exports = {dishId};

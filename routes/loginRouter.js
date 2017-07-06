@@ -1,28 +1,24 @@
-// user routes:
-// home page /
-// login page /login
-// signup page /register 
-// profile page 
-
 const express = require('express');
 const jsonParser = require('body-parser').json();
 const path = require('path');
 const bcrypt = require('bcryptjs');
 const session = require('client-sessions');
 const expressValidator = require('express-validator');
+const flash = require('connect-flash');
 
-const {Userid} = require('../models/userModels');
+const {userId} = require('../models/userModels');
 
 const router = express.Router();
 
 router.use(jsonParser);
 router.use(expressValidator());
+router.use(flash());
 
 // set Sessions parameters
 
 router.use(session({
   cookieName: 'session',
-  secret: 'random_string_goes_here',
+  secret: 'J35u!5n3@T0urc0!ng',
   duration: 30 * 60 * 1000,
   activeDuration: 5 * 60 * 1000,
 }));
@@ -32,7 +28,7 @@ router.use(session({
 const checkUserCookie = (req, res, next) => {
   let user;
   if (req.session && req.session.user) { // if session exists
-    Userid
+    userId
         .findOne({ email: req.session.user.email }) // find user with email
         .exec()
         .then( _user => {
@@ -61,11 +57,10 @@ const requireLogin = (req,res,next) => {
 
 router.use(checkUserCookie) 
 
-
 // Users PAGE - show all users - do not use in production
 
 router.get('/users', (req,res) => {
-    Userid
+    userId
         .find()
         .exec()
         .then(users => {
@@ -89,23 +84,21 @@ router.get('/', (req,res) => {
 router.get('/login', (req,res) => {
     res.sendFile(path.join(__dirname,"../views/login.html"));
 })
+
 // Process login page
 
 router.post('/login', (req, res) => { 
     let {email, user_password} = req.body;
-    //console.log(email," ",user_password);
     let user;
-    Userid
+    userId
     .findOne({email: email}) // find user with email
     .exec()
     .then(_user =>{
-        //console.log("test: ",_user.user_password)
         user = _user;
-        //console.log("test for user: ",_user.user_password)
         if (!user) {
             console.log("no user");
-            const message = `This user name does not exist`
-            //console.error(message);
+            const message = `This user name does not exist`;
+            // res.sendFile(path.join(__dirname,"../views/login.html"));
             return res.status(409).send(message);
         }
         else {
@@ -115,7 +108,8 @@ router.post('/login', (req, res) => {
                 console.log(passwordCheck);
                 if (passwordCheck === false) {
                     const message = `Incorrect password`
-                    return res.status(409).send(message);
+                    res.sendFile(path.join(__dirname,"../views/login.html"));
+                    // return res.status(409).send(message);
                 }
                 else {
                     // sets a cookie with the user's info
@@ -128,34 +122,8 @@ router.post('/login', (req, res) => {
     })
 });
 
-// Profile/home page - local signup
-
-        // no middleware in place
-        // router.get('/home', (req,res) => {
-        //     console.log("I am home");
-        //     let user;
-        //     if (req.session && req.session.user) { // if session exists
-        //         Userid
-        //         .findOne({email: req.session.user.email}) // find user with email
-        //         .exec()
-        //         .then(_user => {
-        //             user = _user;
-        //             if(!user) { // no user in session
-        //                 console.log("No user");
-        //                 req.session.reset();
-        //                 res.sendFile(path.join(__dirname,"../views/login.html"));
-        //             } else { 
-        //                 //console.log("User in session");
-        //                 res.locals.user = user;
-        //                 res.sendFile(path.join(__dirname,"../views/home.html"));
-        //             }
-        //         })
-        //     } else {
-        //         res.sendFile(path.join(__dirname,"../views/login.html"));
-        //     }
-        // })
-
 // with middleware
+
 router.get('/home', requireLogin, (req,res) => {
     res.sendFile(path.join(__dirname,"../views/home.html"));
 })    
@@ -170,7 +138,7 @@ router.post('/register', (req, res) => {
   console.log(req.body.user_password) ;
 
     const requiredFields = ['email', 'user_password'];
-    for (let i=0; i<requiredFields.length; i++) {
+    for (let i = 0; i < requiredFields.length; i++) {
         const field = requiredFields[i];
         if (!(field in req.body)) {
         const message = `Missing \`${field}\` in request body`
@@ -196,7 +164,7 @@ router.post('/register', (req, res) => {
         console.log('all good - no errors')
     }
 
-  Userid
+  userId
     .find({email}) // find user with email
     .count() // count > 0 if exists
     .exec()
@@ -205,13 +173,13 @@ router.post('/register', (req, res) => {
             console.log("already exist");
             res.status(409).json("This user name is already taken");
         }
-        return Userid.hashPassword(user_password);
+        return userId.hashPassword(user_password);
     })
     .then( // users does not exist - store user data in database
 
         newPassword => {
             console.log(newPassword);
-            Userid 
+            userId 
                 .create({
                 email: email,
                 user_password: newPassword,
@@ -221,9 +189,6 @@ router.post('/register', (req, res) => {
                     lastName: lastName
                     }
                 })
-                // .then(
-                //     users => res.status(201).json(users) // Display user info (raw format)
-                // )
                 .then(
                     res.sendFile(path.join(__dirname,"../views/home.html"))
                 ) 
@@ -236,11 +201,12 @@ router.post('/register', (req, res) => {
 });
 
 // DELETE endpoint
+
 router.delete('/users/:id', (req, res) => {
-  Userid
+  userId
     .findByIdAndRemove(req.params.id)
     .exec()
-    .then(Userid => res.status(204).end())
+    .then(userId => res.status(204).end())
     .catch(err => res.status(404).json({message: 'ID not found'}));
 });
 

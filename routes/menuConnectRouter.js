@@ -1,12 +1,8 @@
-//const express = require('express');
-
-//mport express from 'express';
 const express = require('express');
 const jsonParser = require('body-parser').json();
 const path = require('path');
 
-const {MenuConnectid} = require('../models/menuConnectModels');
-//import Dishid from '../models/dishModels';
+const {menuConnectId} = require('../models/menuConnectModels'); // combines dish and location ids using populate
 
 const router = express.Router();
 router.use(jsonParser);
@@ -23,7 +19,7 @@ router.post('/', (req, res) => {
     }
   }
 
-  MenuConnectid
+  menuConnectId
     .create({
       dishes: req.body.dishes,
       location: req.body.location
@@ -37,10 +33,9 @@ router.post('/', (req, res) => {
     });
 });
 
-// populate
-
+// populate - retrieves all dishes by location
 router.get('/', (req,res) => {
-  MenuConnectid
+  menuConnectId
     .find()
     .populate('dishes')
     .populate('location')
@@ -48,8 +43,7 @@ router.get('/', (req,res) => {
     .then(dishByLocation => res.json(dishByLocation))
 });
 
-// populate by location
-
+// populate by location as filter (used in menusearch.html)
 router.get('/dish', (req,res) => {
   const filters = {}
   const queryableFields = ['location'];
@@ -58,7 +52,7 @@ router.get('/dish', (req,res) => {
           filters[field] = req.query[field];
       }
   });
-  MenuConnectid
+  menuConnectId
     .find(filters)
     .populate('dishes')
     .populate('location')
@@ -71,8 +65,7 @@ router.put('/:id', (req, res) => {
   // ensure that the id in the request path and the one in request body match
   if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
     const message = (
-      `Request path id (${req.params.id}) and request body id ` +
-      `(${req.body.id}) must match`);
+      `Request path id (${req.params.id}) and request body id (${req.body.id}) must match`);
     console.error(message);
     res.status(400).json({message: message});
   }
@@ -86,21 +79,20 @@ router.put('/:id', (req, res) => {
     }
   });
 
-  MenuConnectid
-    // all key/value pairs in toUpdate will be updated -- that's what `$set` does
+  menuConnectId
     .findByIdAndUpdate(req.params.id, {$set: toUpdate}) // find by Mongoose ID
     .exec()
     .then(
-      MenuConnectid => res.status(204).end())
+      menuConnectId => res.status(204).end())
     .catch(err => res.status(404).json({message: 'ID not found'}));
 });
 
 // DELETE endpoint
 router.delete('/:id', (req, res) => {
-  MenuConnectid
+  menuConnectId
     .findByIdAndRemove(req.params.id)
     .exec()
-    .then(MenuConnectid => res.status(204).end())
+    .then(menuConnectId => res.status(204).end())
     .catch(err => res.status(404).json({message: 'ID not found'}));
 });
 

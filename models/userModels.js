@@ -10,16 +10,6 @@ const userInfoSchema = mongoose.Schema({
     firstName: String,
     lastName: String
   },
-  allergens: {
-    milk: false,
-    soy: false,
-    egg: false,
-    wheat: false,
-    peanut: false,
-    tree_nut: false,
-    fish: false,
-    shellfish: false
-  },
   location_id: {type: String}
 });
 
@@ -28,12 +18,9 @@ userInfoSchema.methods.validatePassword = function(password) {
 }
 
 userInfoSchema.statics.hashPassword = function(password) {
-  //console.log(password);
   return bcrypt.hash(password, 10);
 }
 
-// note that all instance methods and virtual properties on our
-// schema must be defined *before* we make the call to `.model`.
-const Userid = mongoose.model('Userid', userInfoSchema);
+const userId = mongoose.model('userId', userInfoSchema);
 
-module.exports = {Userid};
+module.exports = {userId};

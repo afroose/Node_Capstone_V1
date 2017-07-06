@@ -15,13 +15,15 @@ const locationSchema = mongoose.Schema({
 });
 
 // Create virtual for address - Simplify format for readability
-
 locationSchema.virtual('addressString').get(function() {
-  return `${this.address.street}, ${this.address.building}, ${this.address.city}, ${this.address.state} ${this.address.zipcode}`.trim()});
+  return `${this.address.street}, 
+          ${this.address.building},  
+          ${this.address.city},  
+          ${this.address.state}  
+          ${this.address.zipcode}`.trim()});
 
-// Create Instance for address - do not return coords
+// Create Instance for address
 locationSchema.methods.apiRepr = function() {
-
   return {
     id: this._id,
     locationName: this.locationName,
@@ -29,10 +31,6 @@ locationSchema.methods.apiRepr = function() {
   };
 }
 
+const locationId = mongoose.model('locationId', locationSchema);
 
-
-// note that all instance methods and virtual properties on our
-// schema must be defined *before* we make the call to `.model`.
-const Locationid = mongoose.model('Locationid', locationSchema);
-
-module.exports = {Locationid};
+module.exports = {locationId};
