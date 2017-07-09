@@ -1,56 +1,117 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>New Dish</title>
-	
-  <!-- fonts  -->
-  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
-
-  <!-- reset -->
-  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.1.1/normalize.min.css">
-
-  <!-- styles -->
-  <link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.12.1/themes/blitzer/jquery-ui.css">
-  DOCTYPE
-<script
-  src="https://code.jquery.com/jquery-3.2.1.min.js"
-  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-  crossorigin="anonymous"></script>
-<script
-  src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
-  integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
-  crossorigin="anonymous"></script>
-  
-</head>
-
-<body>
-
-<main>
-  <header>
+  <head>
+    <title>Edit Dish</title>
     
-  </header>
-  <form action="/dish" method="post">
-    <fieldset name="edit-dish" class="" >
-      <h1>Edit a dish</h1>
-      <p>
-        <label for="dishName" required>Dish Name</label>
-        <input placeholder="Dish Name" type="text" name="dishName" id="dishName" required/>
-      </p>
-      <p> 
-        <label for="content" required>Dish Content</label>
-        <input placeholder="content" type="text" name="content" id="content" required/>
-      </p>
-      <p>
-        <button type='submit'>Submit</button>
-      </p>
-    </fieldset>
-  </form>
-  
-  <footer>
-    <!-- <img src="images/logo.png" class="logo" /> -->
-    <span class="login">Already have an account? <a href="/login">Log in</span>
-  </footer>
-</main>
+    <!-- fonts  -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 
-</body>
+    <!-- reset -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.1.1/normalize.min.css">
+
+    <!-- styles -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+    <link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.12.1/themes/blitzer/jquery-ui.css">
+    <style>
+      body 		{ padding-top:80px; }
+    </style>
+
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.min.js"
+      integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+      crossorigin="anonymous"></script>
+    <script
+      src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+      integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+      crossorigin="anonymous"></script>
+
+    <script>
+    $( function() {
+      
+      // get a reference to the select element
+      $select = $('#dishes');
+      // request the JSON data and parse into the select element
+      $.ajax({
+        url: '/dish',
+        dataType:'JSON',
+        success:function(data){
+          $select.html('');
+          // iterate over the data and append a select option
+          $.each(data, function(key, val){
+            console.log(val);
+            $select.append('<option data-id="' + val._id + '" id="' + val._id + '">' + val.dishName + '</option>');
+          })
+        },
+        error:function(){
+          //if there is an error append a 'none available' option
+          $select.html('<option id="-1">none available</option>');
+        }
+      });
+    } );
+
+    function watchSubmit() { // pass argument from form
+        $('.js-search-form').submit(function(event){
+            event.preventDefault();
+            var descriptionToPass = $('#dishDescription').val();          
+            console.log("Dish description: ", descriptionToPass);
+            var dishToPass = $(this).find('#dishes>option:selected').data('id');
+            console.log("Dish ID: ",dishToPass);
+            if ( typeof dishToPass === "undefined") {
+              $('.error').html(`<div class='alert alert-danger'>Please select a valid location and dish</div>`);
+            }
+            else {
+              $('.error').html('');
+              $.ajax({
+                url: `/dish/${dishToPass}`,
+                type: 'PUT',
+                data: {
+                  id: dishToPass,
+                  dishDescription: descriptionToPass
+                },
+                success:function(data){
+                  console.log(data);
+                }
+              })
+            }
+        });
+      }
+
+    $(function(){
+        watchSubmit();
+    });    
+    </script>
+
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <div class="col-sm-6 col-sm-offset-3">
+          <h1><span class="fa fa-pencil-square-o"></span> Edit Dish Description</h1>
+
+          <form action="/menu" method="post" class="js-search-form">
+            <fieldset name="edit-dish-entry" class="" >
+              <div class="form-group">
+                <label for="dishes" required>Dish Name</label>
+                <select class="form-control" placeholder="Dish Name" type="text" name="dishes" id="dishes" required/>
+                  <option selected value="base">Please Select</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="dishDescription" required>Dish Description</label>
+                <input class="form-control" placeholder="Enter Description" type="text" data-id="" name="dishDescription" id="dishDescription" required/>
+              </div>
+              <div class="form-group">
+                <button type='submit' class="btn btn-warning btn-lg">Submit</button>
+              </div>
+            </fieldset>
+          </form>
+          <div class='error'></div>
+          <hr>
+          <p>Already have an account? <a href="/login">Login</a></p>
+          <p>Or go <a href="/">home</a>.</p>
+        </div>
+      </div>
+    </main>
+  </body>
 </html>

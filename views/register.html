@@ -83,8 +83,12 @@
 									firstName: firstName,
 									lastName: lastName
 								},
+								error:function(data){                
+									$('.error').html(`<div class='alert alert-danger'>${data.responseText}</div>`); 
+									console.log(`This is ${data.responseText}`);
+								},
 								success:function(data){
-									console.log(data);
+									location.href = "./login.html"            
 								}
 							})
 						}
@@ -130,6 +134,7 @@
 						<label for="location" required>Location</label>
 						<input class="form-control" placeholder="location" type="text" data-id="" name="location" id="location" required/>
 					</div>
+          <div class='error'></div>
 
 					<button type="submit" class="btn btn-warning btn-lg">Signup</button>
 				</form>

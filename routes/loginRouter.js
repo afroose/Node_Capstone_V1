@@ -4,7 +4,6 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const session = require('client-sessions');
 const expressValidator = require('express-validator');
-const flash = require('connect-flash');
 
 const {userId} = require('../models/userModels');
 
@@ -12,7 +11,6 @@ const router = express.Router();
 
 router.use(jsonParser);
 router.use(expressValidator());
-router.use(flash());
 
 // set Sessions parameters
 
@@ -98,8 +96,8 @@ router.post('/login', (req, res) => {
         if (!user) {
             console.log("no user");
             const message = `This user name does not exist`;
-            //res.redirect(`/login?error=${message}`);
-            return res.status(409).send(message);
+            //res.redirect(`/login?error=${message}" - redirect call"`); // redirect method
+            return res.status(403).send(message); // ajax method
         }
         else {
             console.log(user.user_password);
@@ -108,13 +106,15 @@ router.post('/login', (req, res) => {
                 console.log(passwordCheck);
                 if (passwordCheck === false) {
                     const message = `Incorrect password`
-                    // res.sendFile(path.join(__dirname,"../views/login.html"));
                     return res.status(403).send(message);
                 }
                 else {
                     // sets a cookie with the user's info
                     req.session.user = user;
-                    res.sendFile(path.join(__dirname,"../views/home.html"));
+                    const message = `${user.location_id}`
+                    console.log(message);
+                    console.log(`Successful Login`);
+                    return res.status(200).send(message);
                 }
             });
         }
@@ -137,7 +137,7 @@ router.get('/register', (req,res) => {
 router.post('/register', (req, res) => { 
   console.log(req.body.user_password) ;
 
-    const requiredFields = ['email', 'user_password'];
+    const requiredFields = ['email', 'user_password', 'firstName', 'lastName', 'location'];
     for (let i = 0; i < requiredFields.length; i++) {
         const field = requiredFields[i];
         if (!(field in req.body)) {
@@ -151,53 +151,69 @@ router.post('/register', (req, res) => {
 
     let {email, user_password, user_password2, firstName, lastName, location} = req.body;
 
-    // req.checkBody('email', 'Email is required').notEmpty();
-    req.checkBody('email', 'Email is not valid').isEmail();
-    // req.checkBody('password', 'Password is required').notEmpty();
-    // req.checkBody('password2', 'Passwords do not match').equals(req.body.user_password);
+    req.checkBody('email', 'Email is required').notEmpty();
+    req.assert('email', 'Email is not valid').isEmail();
+    req.checkBody('user_password', 'Password is required').notEmpty();
+    req.checkBody('user_password2', 'Passwords do not match').equals(user_password);
 
-    let errors = req.validationErrors();
-
-    if (errors) {
-        console.log('There are errors');
-    } else {
-        console.log('all good - no errors')
-    }
-
-  userId
-    .find({email}) // find user with email
-    .count() // count > 0 if exists
-    .exec()
-    .then(count =>{
-        if (count > 0) { // if user exists - close
-            console.log("already exist");
-            res.status(409).json("This user name is already taken");
-        }
-        return userId.hashPassword(user_password);
-    })
-    .then( // users does not exist - store user data in database
-
-        newPassword => {
-            console.log(newPassword);
-            userId 
-                .create({
-                email: email,
-                user_password: newPassword,
-                location_id: location,
-                name: {
-                    firstName: firstName,
-                    lastName: lastName
+//     req.getValidationResult().then(function(result) {
+//   // do something with the validation result
+//         if (!result.isEmpty()) {
+//             console.log("validation created errors")
+//         } else {
+//             console.log("validation created errors")
+//         }
+//     });
+    
+        //let errors = req.getValidationResult();
+        
+        
+    req.getValidationResult().then(function(result) {
+  // do something with the validation result
+        if (!result.isEmpty()) {
+            console.log('There are errors');
+            let errors = result.useFirstErrorOnly().array();
+            console.log(errors)
+            //const message = `Email is not valid`
+            return res.status(409).send(errors[0].msg);
+        } else {
+            console.log('all good - no errors')
+            userId
+            .find({email}) // find user with email
+            .count() // count > 0 if exists
+            .exec()
+            .then(count =>{
+                if (count > 0) { // if user exists - close
+                    console.log("already exist");
+                    const message = `This user name is already taken`
+                    return res.status(409).send(message);
+                }
+                return userId.hashPassword(user_password);
+            })
+            .then( // users does not exist - store user data in database
+                newPassword => {
+                    console.log(newPassword);
+                    userId 
+                        .create({
+                        email: email,
+                        user_password: newPassword,
+                        location_id: location,
+                        name: {
+                            firstName: firstName,
+                            lastName: lastName
+                            }
+                        })
+                        .then(
+                            res.sendFile(path.join(__dirname,"../views/login.html"))
+                        ) 
+                        .catch(err => {
+                            console.error(err);
+                            res.status(500).json({message: 'Internal server error'});
+                        })
                     }
-                })
-                .then(
-                    res.sendFile(path.join(__dirname,"../views/home.html"))
-                ) 
-                .catch(err => {
-                    console.error(err);
-                    res.status(500).json({message: 'Internal server error'});
-                })
-            }
-        )
+            )
+        }
+    })
 });
 
 // DELETE endpoint
