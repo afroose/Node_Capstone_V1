@@ -56,7 +56,6 @@ const requireLogin = (req,res,next) => {
 router.use(checkUserCookie) 
 
 // Users PAGE - show all users - do not use in production
-
 router.get('/users', (req,res) => {
     userId
         .find()
@@ -71,8 +70,19 @@ router.get('/users', (req,res) => {
         });
 })
 
-// Index page - Hello World
+// GET user by id
+router.get('/user/:id', (req, res) => {
+  userId
+    .findById(req.params.id)
+    .exec()
+    .then(user =>res.json(user))
+    .catch(err => {
+      console.error(err);
+        res.status(404).json({message: 'User Not Found'})
+    });
+});
 
+// Index page - Choose Login or Register
 router.get('/', (req,res) => {
     res.sendFile(path.join(__dirname,"../views/index.html"));
 })
@@ -111,7 +121,7 @@ router.post('/login', (req, res) => {
                 else {
                     // sets a cookie with the user's info
                     req.session.user = user;
-                    const message = `${user.location_id}`
+                    const message = `${user.id}`
                     console.log(message);
                     console.log(`Successful Login`);
                     return res.status(200).send(message);

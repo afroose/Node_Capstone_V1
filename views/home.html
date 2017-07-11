@@ -1,20 +1,199 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<head>
-	<title>Node Authentication</title>
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
-	<style>
-		body 		{ padding-top:80px; }
-	</style>
-</head>
-<body>
-<div class="container">
+  <head>
+    <title>Welcome</title>
+    
+    <!-- fonts  -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 
-	<div class="jumbotron text-center">
-		<h1>Home Page</h1>
-	</div>
+    <!-- reset -->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.1.1/normalize.min.css">
 
-</div>
-</body>
+    <!-- styles -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/cerulean/bootstrap.min.css"> <!-- load bootstrap css -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+    <link rel="stylesheet" type="text/css" href="https://code.jquery.com/ui/1.12.1/themes/blitzer/jquery-ui.css">
+    <style>
+      body 		{ padding-top:80px; }
+			.alert {
+				display: none;
+			}
+			.panel-heading {
+				font-size: larger;
+			}
+			.col-md-6{
+				padding-left: 5px;
+				padding-right: 5px;
+			}
+			.form-group label {
+				float: left;
+				text-align: left;
+				font-weight: normal;
+			}
+			.form-group select {
+				display: inline-block;
+				width: auto;
+				vertical-align: middle;
+			}
+    </style>
+
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.min.js"
+      integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+      crossorigin="anonymous"></script>
+    <script
+      src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+      integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+      crossorigin="anonymous"></script>
+
+    <script>
+    $( function() {
+
+      var getUrlParameter = function getUrlParameter(sParam) {
+          var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+              sURLVariables = sPageURL.split('&'),
+              sParameterName,
+              i;
+
+          for (i = 0; i < sURLVariables.length; i++) {
+              sParameterName = sURLVariables[i].split('=');
+
+              if (sParameterName[0] === sParam) {
+                  return sParameterName[1] === undefined ? true : sParameterName[1];
+              }
+          }
+      };   
+      var findUser = getUrlParameter('id');
+      console.log(findUser); 
+      
+      $.ajax({
+        url: `/user/${findUser}`,
+        dataType:'JSON',
+        success:function(data){
+          console.log(`First Name: ${data.name.firstName}`);
+					$('#welcome').prepend(`
+					
+						<form class="form-inline">
+  						<div class="form-group">
+    						<label for="locationBox">Welcome, ${data.name.firstName}, your are looking at the menu for ...
+									<select class="form-control">
+										<option selected value="base">Please Select</option>
+									</select>
+								</label>								
+  						</div>
+						</form>
+					
+					`);
+          console.log(`Location: ${data.location_id}`);
+					let findLocation = data.location_id;
+
+					$.ajax({
+						url: `/menu/dish?location=${findLocation}`,
+						dataType:'JSON',
+						success:function(data){
+							let formattedTextElement = '';
+							let resultElement = '';
+							$.each(data, function(key, val){
+								console.log(val);
+								resultElement += `<p>${val.dishes[0].dishName}</p>`;       
+
+
+								$('.location-name').prepend(`<h1><span class="fa fa-list"></span> Available dishes for ${val.location[0].locationName}</h1>`);     
+								console.log(resultElement);
+							})
+							// $('.dish-result').prepend(`${resultElement}`);
+						},
+						error:function(){      }
+					});
+
+        },
+        error:function(){      }
+      });
+      
+
+    } ); 
+    </script>
+  </head>
+
+  <body>
+    <main>
+      <div class="container">
+				<div class="panel panel-default">
+					<div class="panel-heading" id="welcome">
+					</div>
+    			<div class="panel-body">      
+						<div class="alert alert-success">
+							<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+								<strong>Successfully submitted!</strong> The form is valid.
+						</div>
+						<header class="location-name"></header>
+
+						<div class="dish-result-container">
+							<div class="dish-result">
+								
+								<div class="col-md-6">
+									<div class="panel panel-default dish-panel">
+										<div class="panel-heading">
+											Chicken Cordon Bleu
+										</div>
+										<div class="panel-body"> 
+											Tender chicken cutlets lightly breaded and stuffed with ham and Gruyere cheese
+										</div>
+										<div class="panel-footer">
+											<button class="btn btn-primary">Edit dish description</button>
+										</div>
+									</div>			
+								</div>
+								<div class="col-md-6">
+									<div class="panel panel-default dish-panel">
+										<div class="panel-heading">
+											Chicken Cordon Bleu
+										</div>
+										<div class="panel-body"> 
+											Tender chicken cutlets lightly breaded and stuffed with ham and Gruyere cheese
+										</div>
+										<div class="panel-footer">
+											<button class="btn btn-primary">Edit dish description</button>
+										</div>
+									</div>			
+								</div>
+								
+								
+								<div class="col-md-6">
+									<div class="panel panel-default dish-panel">
+										<div class="panel-heading">
+											Chicken Cordon Bleu
+										</div>
+										<div class="panel-body"> 
+											Tender chicken cutlets lightly breaded and stuffed with ham and Gruyere cheese
+										</div>
+										<div class="panel-footer">
+											<button class="btn btn-primary">Edit dish description</button>
+										</div>
+									</div>			
+								</div>
+								<div class="col-md-6">
+									<div class="panel panel-default dish-panel">
+										<div class="panel-heading">
+											Chicken Cordon Bleu
+										</div>
+										<div class="panel-body"> 
+											Tender chicken cutlets lightly breaded and stuffed with ham and Gruyere cheese
+										</div>
+										<div class="panel-footer">
+											<button class="btn btn-primary">Edit dish description</button>
+										</div>
+									</div>			
+								</div>
+
+							</div>
+						</div>
+						<div class='error'></div>
+					</div>
+					<div class="panel-footer">Footer
+					</div>
+				</div>
+      </div>
+    </main>
+  </body>
 </html>
