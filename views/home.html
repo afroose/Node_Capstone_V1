@@ -35,6 +35,17 @@
 				width: auto;
 				vertical-align: middle;
 			}
+			.modal-body .form-horizontal .col-sm-2,
+			.modal-body .form-horizontal .col-sm-10 {
+					width: 100%
+			}
+
+			.modal-body .form-horizontal .control-label {
+					text-align: left;
+			}
+			.modal-body .form-horizontal .col-sm-offset-2 {
+					margin-left: 15px;
+			}
     </style>
 
     <script
@@ -45,6 +56,10 @@
       src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
       integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
       crossorigin="anonymous"></script>
+		<script 
+			src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" 
+			integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" 
+			crossorigin="anonymous"></script>
 
     <script>
 
@@ -111,7 +126,7 @@
 												</form>
 											</div>
 											<div class="panel-footer">
-												<button class="submit-dish btn btn-info" data-id="${val.dishes[0]._id}">Submit dish description</button>
+												<button class="submit-dish-description btn btn-info" data-id="${val.dishes[0]._id}">Submit dish description</button>
 											</div>
 										</div>	
 									</div>
@@ -190,7 +205,8 @@
 					$(this).siblings(".edit-dish-input").toggle();
 			});			
 			
-			$('body').on('click', '.submit-dish', function(event){
+			// Edit Dish description
+			$('body').on('click', '.submit-dish-description', function(event){
 				event.preventDefault();
 				var descriptionToPass = $('#dishDescription').val();          
 				console.log("Dish description: ", descriptionToPass);
@@ -207,9 +223,140 @@
 						console.log(data);
 					}
 				})
-				console.log(`Location after edit is: ${$('#location>option:selected').data('id')}`);
 				renderLocationData($('#location>option:selected').data('id'));
 			});
+
+			// Create New Dish
+			$('body').on('click', '.submit-new-dish', function(event){
+				event.preventDefault();
+				var descriptionToPass = $('#newDishDescription').val();          
+				console.log("Dish description: ", descriptionToPass);
+				var nameToPass = $('#newDishName').val(); 
+				console.log("Dish ID: ",nameToPass);
+				$.ajax({
+					url: `/dish`,
+					type: 'POST',
+					data: {
+						dishName: nameToPass,
+						dishDescription: descriptionToPass
+					},
+					success:function(data){
+						console.log(data);
+					}
+				})
+				$('#createDishModal').modal('toggle');
+			});
+
+			// Create New Location
+			$('body').on('click', '.submit-new-location', function(event){
+				event.preventDefault();
+				var nameToPass = $('#newLocationName').val(); 
+				console.log("Location Name: ",nameToPass);
+				var street = $('#street').val();
+				var building = $('#building').val();
+				var city = $('#city').val();
+				var state = $('#state').val();
+				var zipcode = $('#zipcode').val();
+				$.ajax({
+					url: `/location`,
+					type: 'POST',
+					data: {
+      			locationName: nameToPass,
+						street: street,
+						building: building,
+						city: city,
+						state: state,
+						zipcode: zipcode
+					},
+					success:function(data){
+						console.log(data);
+					}
+				})
+				$('#createLocationModal').modal('toggle');
+			});
+
+			// Create new menu entry
+			$('body').on('click', '#openMenuModal', function(event){
+				event.preventDefault();
+				$('#createMenuModal').modal('toggle')
+  
+				$( "#menuLocation" ).autocomplete({
+					source: function( request, response ) {
+						$.ajax( {
+							url: "/location/search",
+							data: {
+								location: request.term
+							},
+							success: function( data ) {
+								response($.map(data, function (el) {
+									console.log(el.locationName," - ",el._id)
+									return {
+											label: el.locationName,
+											value: el._id
+									};
+									}));
+								}
+						});
+					},
+					minLength: 3,
+					focus: function (event, ui) { 
+						this.value = ui.item.label; 
+						console.log("location field id: ", this.value);
+						event.preventDefault();
+					},
+					select: function (event, ui) {
+						console.log( "Selected: " + ui.item.value + " aka " + ui.item.label );
+						// Prevent value from being put in the input:
+						$(this).data('id',ui.item.value);
+						this.value = ui.item.label;
+						// Prevent other event from being executed
+						event.preventDefault();
+					}
+				} );
+				
+				// get a reference to the select element
+				$select = $('#menuDishes');
+				// request the JSON data and parse into the select element
+				$.ajax({
+					url: '/dish',
+					dataType:'JSON',
+					success:function(data){
+						$select.html('');
+						// iterate over the data and append a select option
+						$.each(data, function(key, val){
+							console.log(val);
+							$select.append('<option data-id="' + val._id + '" id="' + val._id + '">' + val.dishName + '</option>');
+						})
+					},
+					error:function(){
+						//if there is an error append a 'none available' option
+						$select.html('<option id="-1">none available</option>');
+					}
+				});
+
+				$('body').on('click', '.submit-new-menu', function(event){
+            event.preventDefault();
+            var locationToPass = $('#menuLocation').data('id');          
+            console.log("location ID: ", locationToPass);
+            var dishToPass = $('#menuDishes>option:selected').data('id');
+            console.log("Dish ID: ",dishToPass);
+						$.ajax({
+							url: '/menu',
+							type: 'POST',
+							data: {
+								dishes: dishToPass,
+								location: locationToPass
+							},
+							success:function(data){
+								console.log(data);
+							}
+						})
+					$('#createMenuModal').modal('toggle');
+				});
+
+
+			});
+
 
     } ); 
     </script>
@@ -236,11 +383,230 @@
 					</div>
 					<div class="panel-footer">
               <div class="form-group">
-                <a href="#">Add dishes</a> | <a href="#">Add Location</a> | <a href="#">Add Dish to Menu</a>
+                <a href="#" data-toggle="modal" data-target="#createDishModal">Add Dishes</a> | 
+								<a href="#" data-toggle="modal" data-target="#createLocationModal">Add Locations</a> | 
+								<a href="#" id="openMenuModal">Add Dishes to Menu</a>
               </div>
 					</div>
 				</div>
       </div>
     </main>
+
+		<!-- Modal - Create New Dish -->
+		<div class="modal fade" id="createDishModal" tabindex="-1" role="dialog" aria-labelledby="createDishModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<!-- Modal Header -->
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&times;</span>
+							<span class="sr-only">Close</span>
+						</button>
+						<h1 class="modal-title" id="createDishModalLabel"><span class="fa fa-pencil-square-o"></span> Create a new dish</h1>
+					</div>
+					<!-- Modal Body -->
+					<div class="modal-body">
+						<form class="form-horizontal" role="form" action="/dish" method="post">
+							<div class="form-group">
+								<label  class="col-sm-2 control-label" for="newDishName">Dish Name</label>
+								<div class="col-sm-10">
+									<input class="form-control" placeholder="Dish Name" type="text" name="newDishName" id="newDishName" required/>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label" for="newDishDescription" >Dish Content - Description</label>
+								<div class="col-sm-10">
+									<input class="form-control" placeholder="Dish Description" type="text" name="newDishDescription" id="newDishDescription" required/>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-offset-2 col-sm-10">
+									<button type="submit" class="submit-new-dish btn btn-warning">Create New Dish</button>
+								</div>
+							</div>
+						</form>
+					</div>
+					<!-- Modal Footer -->
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default"	data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal - Create New Location -->
+		<div class="modal fade" id="createLocationModal" tabindex="-1" role="dialog" aria-labelledby="createLocationModal" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<!-- Modal Header -->
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&times;</span>
+							<span class="sr-only">Close</span>
+						</button>
+						<h1 class="modal-title" id="createLocationModal"><span class="fa fa-pencil-square-o"></span> Create a new Location</h1>
+					</div>
+					<!-- Modal Body -->
+					<div class="modal-body">
+						<form class="form-horizontal" role="form" action="/location" method="post">
+							<div class="form-group">
+								<label  class="col-sm-2 control-label" for="newLocationName">Location Name</label>
+								<div class="col-sm-10">
+									<input class="form-control" placeholder="Location Name" type="text" name="newLocationName" id="newLocationName" required/>
+								</div>
+							</div>
+							<!-- address-line input-->
+							<div class="form-group">
+								<label class="col-sm-2 control-label" for="street" required>Address Line 1</label>
+								<div class="col-sm-10">
+									<input class="form-control" placeholder="Address line 1" type="text" name="street" id="street" required/>
+									<p class="help-block">Street address, P.O. box, company name, c/o</p>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label" for="building">Address Line 2</label>
+								<div class="col-sm-10">
+									<input class="form-control" placeholder="Address line 2" type="text" name="building" id="building" />
+									<p class="help-block">Apartment, suite , unit, building, floor, etc.</p>
+								</div>
+							</div>
+							<!-- city input-->
+							<div class="form-group">
+								<label class="col-sm-2 control-label" for="city" required>City / Town</label>
+								<div class="col-sm-10">
+									<input class="form-control" placeholder="City" type="text" name="city" id="city" required/>
+									<p class="help-block"></p>
+								</div>
+							</div>
+							<!-- State input-->
+							<div class="form-group">
+								<label class="col-sm-2 control-label" for="state" required>State / Province / Region</label>
+								<div class="col-sm-10">
+									<select class="form-control" name="state" id="state" >
+										<option value="">-- Please Select --</option>
+										<option value="al">Alabama (AL)</option>
+										<option value="ak">Alaska (AK)</option>
+										<option value="az">Arizona (AZ)</option>
+										<option value="ar">Arkansas (AR)</option>
+										<option value="ca">California (CA)</option>
+										<option value="co">Colorado (CO)</option>
+										<option value="ct">Connecticut (CT)</option>
+										<option value="de">Delaware (DE)</option>
+										<option value="dc">District of Columbia (DC)</option>
+										<option value="fl">Florida (FL)</option>
+										<option value="ga">Georgia (GA)</option>
+										<option value="hi">Hawaii (HI)</option>
+										<option value="id">Idaho (ID)</option>
+										<option value="il">Illinois (IL)</option>
+										<option value="in">Indiana (IN)</option>
+										<option value="ia">Iowa (IA)</option>
+										<option value="ks">Kansas (KS)</option>
+										<option value="ky">Kentucky (KY)</option>
+										<option value="la">Louisiana (LA)</option>
+										<option value="me">Maine (ME)</option>
+										<option value="md">Maryland (MD)</option>
+										<option value="ma">Massachusetts (MA)</option>
+										<option value="mi">Michigan (MI)</option>
+										<option value="mn">Minnesota (MN)</option>
+										<option value="ms">Mississippi (MS)</option>
+										<option value="mo">Missouri (MO)</option>
+										<option value="mt">Montana (MT)</option>
+										<option value="ne">Nebraska (NE)</option>
+										<option value="nv">Nevada (NV)</option>
+										<option value="nh">New Hampshire (NH)</option>
+										<option value="nj">New Jersey (NJ)</option>
+										<option value="nm">New Mexico (NM)</option>
+										<option value="ny">New York (NY)</option>
+										<option value="nc">North Carolina (NC)</option>
+										<option value="nd">North Dakota (ND)</option>
+										<option value="oh">Ohio (OH)</option>
+										<option value="ok">Oklahoma (OK)</option>
+										<option value="or">Oregon (OR)</option>
+										<option value="pa">Pennsylvania (PA)</option>
+										<option value="ri">Rhode Island (RI)</option>
+										<option value="sc">South Carolina (SC)</option>
+										<option value="sd">South Dakota (SD)</option>
+										<option value="tn">Tennessee (TN)</option>
+										<option value="tx">Texas (TX)</option>
+										<option value="ut">Utah (UT)</option>
+										<option value="vt">Vermont (VT)</option>
+										<option value="va">Virginia (VA)</option>
+										<option value="wa">Washington (WA)</option>
+										<option value="wv">West Virginia (WV)</option>
+										<option value="wi">Wisconsin (WI)</option>
+										<option value="wy">Wyoming (WY)</option>
+									</select>          
+									<p class="help-block"></p>
+								</div>
+							</div>
+							<!-- zip-code input-->
+							<div class="form-group">
+								<label class="col-sm-2 control-label" for="zipcode" required>zip code</label>
+								<div class="col-sm-10">
+									<input class="form-control" placeholder="Zip Code" pattern="[0-9]{5}" type="text" name="zipcode" id="zipcode" required/>
+									<p class="help-block">Enter the 5-digit Zip Code (For ex. 18104)</p>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-offset-2 col-sm-10">
+									<button type="submit" class="submit-new-location btn btn-warning">Create New Location</button>
+								</div>
+							</div>
+						</form>
+					</div>
+					<!-- Modal Footer -->
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default"	data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal - Add dishes to Menu -->
+		<div class="modal fade" id="createMenuModal" tabindex="-1" role="dialog" aria-labelledby="createMenuModalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<!-- Modal Header -->
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&times;</span>
+							<span class="sr-only">Close</span>
+						</button>
+						<h1 class="modal-title" id="createMenuModalLabel"><span class="fa fa-pencil-square-o"></span> Add dishes to a location menu</h1>
+					</div>
+					<!-- Modal Body -->
+					<div class="modal-body">
+						<form class="form-horizontal" role="form" action="/menu" method="post">
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="menuLocation" required>Select Location</label>
+								<div class="col-sm-10 ui-front">
+                	<input class="form-control" placeholder="Enter the location" type="text" data-id="" name="menuLocation" id="menuLocation" required/>
+									<p class="help-block">Type the location you are looking for, the auto-complete will bring the appropriate suggestions.</p>
+								</div>
+              </div>
+              <div class="form-group">
+                <label class="col-sm-2 control-label" for="menuDishes" required>Dish Name</label>
+								<div class="col-sm-10">
+									<select class="form-control" placeholder="Dish Name" type="text" name="menuDishes" id="menuDishes" required/>
+										<option selected value="base">Please Select</option>
+									</select>
+								</div>
+              </div>
+							<div class="form-group">
+								<div class="col-sm-offset-2 col-sm-10">
+									<button type="submit" class="submit-new-menu btn btn-warning">Create New Menu Entry</button>
+								</div>
+							</div>
+						</form>
+					</div>
+					<!-- Modal Footer -->
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default"	data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+              
+
   </body>
 </html>
