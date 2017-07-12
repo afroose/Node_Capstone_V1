@@ -106,12 +106,14 @@
 												Edit Dish Description
 											</div>
 											<div class="panel-body"> 
-												Enter Text Here
+												<form class="js-search-form">
+													<input class="form-control" placeholder="Enter Description" type="text" data-id="" name="dishDescription" id="dishDescription" required/>
+												</form>
 											</div>
 											<div class="panel-footer">
-												<button class="submit-dish btn btn-info">Submit dish description</button>
+												<button class="submit-dish btn btn-info" data-id="${val.dishes[0]._id}">Submit dish description</button>
 											</div>
-										</div>			
+										</div>	
 									</div>
 								</div>			
 							</div>
@@ -121,7 +123,6 @@
 				},
 				error:function(){      }
 			});
-
 		}
 		
     function renderList() {
@@ -187,6 +188,27 @@
 					var idToPass = $(this).data('id');
 					$(this).toggle();
 					$(this).siblings(".edit-dish-input").toggle();
+			});			
+			
+			$('body').on('click', '.submit-dish', function(event){
+				event.preventDefault();
+				var descriptionToPass = $('#dishDescription').val();          
+				console.log("Dish description: ", descriptionToPass);
+				var dishToPass = $(this).data('id');
+				console.log("Dish ID: ",dishToPass);
+				$.ajax({
+					url: `/dish/${dishToPass}`,
+					type: 'PUT',
+					data: {
+						id: dishToPass,
+						dishDescription: descriptionToPass
+					},
+					success:function(data){
+						console.log(data);
+					}
+				})
+				console.log(`Location after edit is: ${$('#location>option:selected').data('id')}`);
+				renderLocationData($('#location>option:selected').data('id'));
 			});
 
     } ); 
