@@ -47,8 +47,106 @@
       crossorigin="anonymous"></script>
 
     <script>
-    $( function() {
 
+      
+		function RenderUserData(userId) {
+			$.ajax({
+				url: `/user/${userId}`,
+				dataType:'JSON',
+				success:function(data){
+					console.log(`First Name: ${data.name.firstName}`);
+					console.log(`Location: ${data.location_id}`);
+					let findLocation = data.location_id;
+					let userName = data.name.firstName; 
+					$('#welcome').prepend(`								
+						<form class="form-inline">
+							<div class="form-group">
+								<label for="locationBox">Welcome, ${userName}, your are looking at the menu for ...
+									<select class="form-control" name="location" id="location" value="">
+										<option selected value="base">Please Select</option>
+									</select>
+								</label>								
+							</div>
+						</form>					
+					`);
+					renderList();
+					renderLocationData(findLocation);
+				},
+				error:function(){      }
+			});
+		};
+
+		function renderLocationData(locationId) {
+			$('.location-name').empty();
+			$('.dish-result').empty();
+			$.ajax({
+				url: `/menu/dish?location=${locationId}`,
+				dataType:'JSON',
+				success:function(data){
+					let formattedTextElement = '';
+					let resultElement = '';
+					$.each(data, function(key, val){
+						console.log(key); 
+						if (key === 0) $('.location-name').prepend(`<h1><span class="fa fa-list"></span> Available dishes for ${val.location[0].locationName}</h1>`);  
+						$("#location").val(`${val.location[0].locationName}`);
+						resultElement += `
+							<div class="col-md-6">
+								<div class="panel panel-default dish-panel">
+									<div class="panel-heading">
+										${val.dishes[0].dishName}
+									</div>
+									<div class="panel-body"> 
+										${val.dishes[0].dishDescription}
+									</div>
+									<div class="panel-footer">
+										<button class="edit-dish-button btn btn-primary" data-id="${val.dishes[0]._id}">Edit dish description</button>
+										
+										<div class="edit-dish-input panel panel-info dish-panel" style="display: none">
+											<div class="panel-heading">
+												Edit Dish Description
+											</div>
+											<div class="panel-body"> 
+												Enter Text Here
+											</div>
+											<div class="panel-footer">
+												<button class="submit-dish btn btn-info">Submit dish description</button>
+											</div>
+										</div>			
+									</div>
+								</div>			
+							</div>
+						`; 	
+					})
+					$('.dish-result').prepend(`${resultElement}`); 
+				},
+				error:function(){      }
+			});
+
+		}
+		
+    function renderList() {
+      // get a reference to the select element
+      $select = $('#location');
+			$select.empty();
+      // request the JSON data and parse into the select element
+      $.ajax({
+        url: '/location/select',
+        dataType:'JSON',
+        success:function(data){
+          // iterate over the data and append a select option
+          $.each(data.locations, function(key, val){
+            console.log(val);
+            $select.append('<option data-id="' + val._id + '" id="' + val._id + '">' + val.locationName + '</option>');
+          })
+        },
+        error:function(){
+          //if there is an error append a 'none available' option
+          $select.html('<option id="-1">none available</option>');
+        }
+      });
+		}
+					
+    $( function() {
       var getUrlParameter = function getUrlParameter(sParam) {
           var sPageURL = decodeURIComponent(window.location.search.substring(1)),
               sURLVariables = sPageURL.split('&'),
@@ -65,51 +163,31 @@
       };   
       var findUser = getUrlParameter('id');
       console.log(findUser); 
-      
-      $.ajax({
-        url: `/user/${findUser}`,
-        dataType:'JSON',
-        success:function(data){
-          console.log(`First Name: ${data.name.firstName}`);
-					$('#welcome').prepend(`
-					
-						<form class="form-inline">
-  						<div class="form-group">
-    						<label for="locationBox">Welcome, ${data.name.firstName}, your are looking at the menu for ...
-									<select class="form-control">
-										<option selected value="base">Please Select</option>
-									</select>
-								</label>								
-  						</div>
-						</form>
-					
-					`);
-          console.log(`Location: ${data.location_id}`);
-					let findLocation = data.location_id;
 
-					$.ajax({
-						url: `/menu/dish?location=${findLocation}`,
-						dataType:'JSON',
-						success:function(data){
-							let formattedTextElement = '';
-							let resultElement = '';
-							$.each(data, function(key, val){
-								console.log(val);
-								resultElement += `<p>${val.dishes[0].dishName}</p>`;       
+			// call function to render the page
+			RenderUserData(findUser);
 
+			// Re-render page when location is changed
+			$('body').on('change','select',function (event) {
+				console.log($(this).val());
+				$.ajax({
+					url: `/location/Name/${$(this).val()}`,
+					dataType:'JSON',
+					success:function(data){
+						console.log(`Location: ${data._id}`);
+						renderList();
+						renderLocationData(data._id);
+					},
+					error:function(){      }
+				});
+			});			
 
-								$('.location-name').prepend(`<h1><span class="fa fa-list"></span> Available dishes for ${val.location[0].locationName}</h1>`);     
-								console.log(resultElement);
-							})
-							// $('.dish-result').prepend(`${resultElement}`);
-						},
-						error:function(){      }
-					});
-
-        },
-        error:function(){      }
-      });
-      
+			$('body').on('click','.edit-dish-button',function (event) {
+					event.preventDefault(); // do not submit yet
+					var idToPass = $(this).data('id');
+					$(this).toggle();
+					$(this).siblings(".edit-dish-input").toggle();
+			});
 
     } ); 
     </script>
@@ -129,68 +207,15 @@
 						<header class="location-name"></header>
 
 						<div class="dish-result-container">
-							<div class="dish-result">
-								
-								<div class="col-md-6">
-									<div class="panel panel-default dish-panel">
-										<div class="panel-heading">
-											Chicken Cordon Bleu
-										</div>
-										<div class="panel-body"> 
-											Tender chicken cutlets lightly breaded and stuffed with ham and Gruyere cheese
-										</div>
-										<div class="panel-footer">
-											<button class="btn btn-primary">Edit dish description</button>
-										</div>
-									</div>			
-								</div>
-								<div class="col-md-6">
-									<div class="panel panel-default dish-panel">
-										<div class="panel-heading">
-											Chicken Cordon Bleu
-										</div>
-										<div class="panel-body"> 
-											Tender chicken cutlets lightly breaded and stuffed with ham and Gruyere cheese
-										</div>
-										<div class="panel-footer">
-											<button class="btn btn-primary">Edit dish description</button>
-										</div>
-									</div>			
-								</div>
-								
-								
-								<div class="col-md-6">
-									<div class="panel panel-default dish-panel">
-										<div class="panel-heading">
-											Chicken Cordon Bleu
-										</div>
-										<div class="panel-body"> 
-											Tender chicken cutlets lightly breaded and stuffed with ham and Gruyere cheese
-										</div>
-										<div class="panel-footer">
-											<button class="btn btn-primary">Edit dish description</button>
-										</div>
-									</div>			
-								</div>
-								<div class="col-md-6">
-									<div class="panel panel-default dish-panel">
-										<div class="panel-heading">
-											Chicken Cordon Bleu
-										</div>
-										<div class="panel-body"> 
-											Tender chicken cutlets lightly breaded and stuffed with ham and Gruyere cheese
-										</div>
-										<div class="panel-footer">
-											<button class="btn btn-primary">Edit dish description</button>
-										</div>
-									</div>			
-								</div>
-
+							<div class="dish-result">	
 							</div>
 						</div>
 						<div class='error'></div>
 					</div>
-					<div class="panel-footer">Footer
+					<div class="panel-footer">
+              <div class="form-group">
+                <a href="#">Add dishes</a> | <a href="#">Add Location</a> | <a href="#">Add Dish to Menu</a>
+              </div>
 					</div>
 				</div>
       </div>

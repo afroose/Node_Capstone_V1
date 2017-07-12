@@ -22,6 +22,18 @@ router.get('/', (req,res) => {
     });
 });
 
+// Find location by locationName
+router.get('/Name/:location', (req, res) => {
+  locationId
+    .findOne({'locationName': req.params.location})
+    .exec()
+    .then(locations =>res.json(locations))
+    .catch(err => {
+      console.error(err);
+        res.status(404).json({message: 'Location Name Not Found'})
+    });
+});
+
 // POST endpoint
 router.post('/', (req, res) => {
   const requiredFields = ['locationName', 'street', 'city', 'state', 'zipcode'];
@@ -102,5 +114,17 @@ router.get('/search', (req,res) => {
     res.json([])
   }
 });
+
+// Search - fill select field in home page
+router.get('/select', (req,res) => {
+  locationId
+    .find()
+    .exec()
+    .then(locations => {
+      res.json({locations}
+        )
+      });
+});
+
 
 module.exports = router;
