@@ -34,6 +34,15 @@ router.get('/Name/:location', (req, res) => {
     });
 });
 
+// Find location by Id
+router.get('/Filter/:id', (req, res) => {
+  locationId
+    .findById(req.params.id) // find by Mongoose ID
+    .exec()
+    .then(locations =>res.json(locations))
+    .catch(err => res.status(404).json({message: 'ID not found'}));
+});
+
 // POST endpoint
 router.post('/', (req, res) => {
   const requiredFields = ['locationName', 'street', 'city', 'state', 'zipcode'];

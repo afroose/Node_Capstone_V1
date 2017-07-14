@@ -18,43 +18,28 @@
 			integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
 			crossorigin="anonymous"></script>
 			
-		<script>
-		$( function() {
-	
-			$( "#location" ).autocomplete({
-				source: function( request, response ) {
-					$.ajax( {
-						url: "/location/search",
-						data: {
-							location: request.term
-						},
-						success: function( data ) {
-							response($.map(data, function (el) {
-								console.log(el.locationName," - ",el._id)
-								return {
-										label: el.locationName,
-										value: el._id
-									};
-								}));
-							}
-					});
+		<script>	
+		
+		function renderList() {
+			// get a reference to the select element
+			$select = $('#location');
+			// request the JSON data and parse into the select element
+			$.ajax({
+				url: '/location/select',
+				dataType:'JSON',
+				success:function(data){
+					// iterate over the data and append a select option
+					$.each(data.locations, function(key, val){
+						console.log(val);
+						$select.append('<option data-id="' + val._id + '" id="' + val._id + '">' + val.locationName + '</option>');
+					})
 				},
-				minLength: 3,
-				focus: function (event, ui) { 
-					this.value = ui.item.label; 
-					console.log("location field id: ", this.value);
-					// Prevent other event from not being execute
-					event.preventDefault();
-				},
-				select: function (event, ui) {
-					console.log( "Selected: " + ui.item.value + " aka " + ui.item.label );
-					// Prevent value from being put in the input:
-					$(this).data('id',ui.item.value);
-					this.value = ui.item.label;
-					event.preventDefault();
+				error:function(){
+					//if there is an error append a 'none available' option
+					$select.html('<option id="-1">none available</option>');
 				}
-			} );
-		} );
+			});
+		}
 
 		function watchSubmit() { // pass argument from form
 				$('.js-register-form').submit(function(event){
@@ -65,7 +50,7 @@
 						var firstName = $('#firstName').val();
 						var lastName = $('#lastName').val();
 
-						var locationToPass = $(this).find('#location').data('id');  
+						var locationToPass = $(this).find(':selected').data('id');  
 						console.log("location ID: ", locationToPass);
 						if ( typeof locationToPass === "undefined") {
 							$('.error').html('Please select a valid location');
@@ -96,6 +81,8 @@
 			}
 
 		$(function(){
+			console.log("start");
+				renderList();
 				watchSubmit();
 		});    
 		</script>
@@ -132,7 +119,9 @@
 
 					<div class="form-group">
 						<label for="location" required>Location</label>
-						<input class="form-control" placeholder="location" type="text" data-id="" name="location" id="location" required/>
+						<select class="form-control" name="location" id="location" value="">
+							<option selected value="base">Please Select</option>
+						</select>
 					</div>
           <div class='error'></div>
 

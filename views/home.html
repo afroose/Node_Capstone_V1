@@ -62,7 +62,6 @@
 			crossorigin="anonymous"></script>
 
     <script>
-
       
 		function RenderUserData(userId) {
 			$.ajax({
@@ -85,6 +84,7 @@
 						</form>					
 					`);
 					renderList();
+					filterOtherLocation(findLocation);
 					renderLocationData(findLocation);
 				},
 				error:function(){      }
@@ -98,6 +98,7 @@
 				url: `/menu/dish?location=${locationId}`,
 				dataType:'JSON',
 				success:function(data){
+					console.log(data.keys.length);
 					let formattedTextElement = '';
 					let resultElement = '';
 					$.each(data, function(key, val){
@@ -161,6 +162,32 @@
         }
       });
 		}
+		
+    function filterOtherLocation(findLocation) {
+      // get a reference to the select element
+      $select = $('#location');
+			$select.empty();
+      // request the JSON data and parse into the select element
+      $.ajax({
+        url: `/location/Filter/${findLocation}`,
+        dataType:'JSON',
+        success:function(data){
+					console.log(`Location: ${data.locationName}`);
+					$("#location").val(`${data.locationName}`);
+					if (data.locationName === "Other location" ) {
+						console.log("Change location");
+						$('#attachLocationModal .modal-header button').hide();
+						$('#attachLocationModal .modal-footer button').hide();
+						$('#attachLocationModal').modal('toggle');
+						$("#attachLocationModal .alert-warning").prepend('<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><p>You have not selected/created a valid location. Please create a new location. You will be able to create the menu associated with that location afterwards.</p>').toggle();
+					};
+        },
+        error:function(){
+          //if there is an error append a 'none available' option
+          $select.html('<option id="-1">none available</option>');
+        }
+      });
+		}
 					
     $( function() {
       var getUrlParameter = function getUrlParameter(sParam) {
@@ -184,7 +211,7 @@
 			RenderUserData(findUser);
 
 			// Re-render page when location is changed
-			$('body').on('change','select',function (event) {
+			$('body').on('change','#location select',function (event) {
 				console.log($(this).val());
 				$.ajax({
 					url: `/location/Name/${$(this).val()}`,
@@ -273,6 +300,51 @@
 					}
 				})
 				$('#createLocationModal').modal('toggle');
+			});
+
+			// Attach New Location
+			$('body').on('click', '#attach-new-location', function(event){
+				event.preventDefault();
+				var nameToPass = $('#attachLocationName').val(); 
+				console.log("Location Name: ",nameToPass);
+				var street = $('#attachStreet').val();
+				var building = $('#attachBuilding').val();
+				var city = $('#attachCity').val();
+				var state = $('#attachState').val();
+				var zipcode = $('#attachZipcode').val();
+				$.ajax({
+					url: `/location`,
+					type: 'POST',
+					data: {
+      			locationName: nameToPass,
+						street: street,
+						building: building,
+						city: city,
+						state: state,
+						zipcode: zipcode
+					},
+					success:function(data){
+						console.log(data.id);
+					}
+				})
+				// user id
+				console.log(findUser);
+				// Attach new location to user
+				var locationIdToPass = data.id;          
+				console.log("New location to attach: ", data.id);
+				$.ajax({
+					url: `/dish/${finduser}`,
+					type: 'PUT',
+					data: {
+						id: finduser,
+						locationIid: locationIdToPass
+					},
+					success:function(data){
+						console.log(data);
+					}
+				})
+				// Rrender page
+				$('#attachLocationModal').modal('hide');
 			});
 
 			// Create new menu entry
@@ -372,6 +444,8 @@
 						<div class="alert alert-success">
 							<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
 								<strong>Successfully submitted!</strong> The form is valid.
+						</div>    
+						<div class="alert alert-warning">
 						</div>
 						<header class="location-name"></header>
 
@@ -437,14 +511,16 @@
 		<!-- Modal - Create New Location -->
 		<div class="modal fade" id="createLocationModal" tabindex="-1" role="dialog" aria-labelledby="createLocationModal" aria-hidden="true">
 			<div class="modal-dialog">
-				<div class="modal-content">
+				<div class="modal-content">    
+					<div class="alert alert-warning">
+					</div>
 					<!-- Modal Header -->
 					<div class="modal-header">
 						<button type="button" class="close" data-dismiss="modal">
 							<span aria-hidden="true">&times;</span>
 							<span class="sr-only">Close</span>
 						</button>
-						<h1 class="modal-title" id="createLocationModal"><span class="fa fa-pencil-square-o"></span> Create a new Location</h1>
+						<h1 class="modal-title" id="createLocationModalLabel"><span class="fa fa-pencil-square-o"></span> Create a new Location</h1>
 					</div>
 					<!-- Modal Body -->
 					<div class="modal-body">
@@ -549,7 +625,7 @@
 							</div>
 							<div class="form-group">
 								<div class="col-sm-offset-2 col-sm-10">
-									<button type="submit" class="submit-new-location btn btn-warning">Create New Location</button>
+									<button type="submit" class="submit-new-location btn btn-warning" id="submit-new-location">Create New Location</button>
 								</div>
 							</div>
 						</form>
@@ -595,6 +671,136 @@
 							<div class="form-group">
 								<div class="col-sm-offset-2 col-sm-10">
 									<button type="submit" class="submit-new-menu btn btn-warning">Create New Menu Entry</button>
+								</div>
+							</div>
+						</form>
+					</div>
+					<!-- Modal Footer -->
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default"	data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Modal - Attach New Location -->
+		<div class="modal fade" id="attachLocationModal" tabindex="-1" role="dialog" aria-labelledby="attachLocationModal" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+			<div class="modal-dialog">
+				<div class="modal-content">    
+					<div class="alert alert-warning">
+					</div>
+					<!-- Modal Header -->
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">
+							<span aria-hidden="true">&times;</span>
+							<span class="sr-only">Close</span>
+						</button>
+						<h1 class="modal-title" id="attachLocationModalLabel"><span class="fa fa-pencil-square-o"></span> Create a new Location</h1>
+					</div>
+					<!-- Modal Body -->
+					<div class="modal-body">
+						<form class="form-horizontal" role="form">
+							<div class="form-group">
+								<label  class="col-sm-2 control-label" for="attachLocationName">Location Name</label>
+								<div class="col-sm-10">
+									<input class="form-control" placeholder="Location Name" type="text" name="attachLocationName" id="attachLocationName" required/>
+								</div>
+							</div>
+							<!-- address-line input-->
+							<div class="form-group">
+								<label class="col-sm-2 control-label" for="attachStreet" required>Address Line 1</label>
+								<div class="col-sm-10">
+									<input class="form-control" placeholder="Address line 1" type="text" name="attachStreet" id="attachStreet" required/>
+									<p class="help-block">Street address, P.O. box, company name, c/o</p>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label" for="attachBuilding">Address Line 2</label>
+								<div class="col-sm-10">
+									<input class="form-control" placeholder="Address line 2" type="text" name="attachBuilding" id="attachBuilding" />
+									<p class="help-block">Apartment, suite , unit, building, floor, etc.</p>
+								</div>
+							</div>
+							<!-- city input-->
+							<div class="form-group">
+								<label class="col-sm-2 control-label" for="attachCity" required>City / Town</label>
+								<div class="col-sm-10">
+									<input class="form-control" placeholder="City" type="text" name="attachCity" id="attachCity" required/>
+									<p class="help-block"></p>
+								</div>
+							</div>
+							<!-- State input-->
+							<div class="form-group">
+								<label class="col-sm-2 control-label" for="attachState" required>State / Province / Region</label>
+								<div class="col-sm-10">
+									<select class="form-control" name="attachState" id="attachState" >
+										<option value="">-- Please Select --</option>
+										<option value="al">Alabama (AL)</option>
+										<option value="ak">Alaska (AK)</option>
+										<option value="az">Arizona (AZ)</option>
+										<option value="ar">Arkansas (AR)</option>
+										<option value="ca">California (CA)</option>
+										<option value="co">Colorado (CO)</option>
+										<option value="ct">Connecticut (CT)</option>
+										<option value="de">Delaware (DE)</option>
+										<option value="dc">District of Columbia (DC)</option>
+										<option value="fl">Florida (FL)</option>
+										<option value="ga">Georgia (GA)</option>
+										<option value="hi">Hawaii (HI)</option>
+										<option value="id">Idaho (ID)</option>
+										<option value="il">Illinois (IL)</option>
+										<option value="in">Indiana (IN)</option>
+										<option value="ia">Iowa (IA)</option>
+										<option value="ks">Kansas (KS)</option>
+										<option value="ky">Kentucky (KY)</option>
+										<option value="la">Louisiana (LA)</option>
+										<option value="me">Maine (ME)</option>
+										<option value="md">Maryland (MD)</option>
+										<option value="ma">Massachusetts (MA)</option>
+										<option value="mi">Michigan (MI)</option>
+										<option value="mn">Minnesota (MN)</option>
+										<option value="ms">Mississippi (MS)</option>
+										<option value="mo">Missouri (MO)</option>
+										<option value="mt">Montana (MT)</option>
+										<option value="ne">Nebraska (NE)</option>
+										<option value="nv">Nevada (NV)</option>
+										<option value="nh">New Hampshire (NH)</option>
+										<option value="nj">New Jersey (NJ)</option>
+										<option value="nm">New Mexico (NM)</option>
+										<option value="ny">New York (NY)</option>
+										<option value="nc">North Carolina (NC)</option>
+										<option value="nd">North Dakota (ND)</option>
+										<option value="oh">Ohio (OH)</option>
+										<option value="ok">Oklahoma (OK)</option>
+										<option value="or">Oregon (OR)</option>
+										<option value="pa">Pennsylvania (PA)</option>
+										<option value="ri">Rhode Island (RI)</option>
+										<option value="sc">South Carolina (SC)</option>
+										<option value="sd">South Dakota (SD)</option>
+										<option value="tn">Tennessee (TN)</option>
+										<option value="tx">Texas (TX)</option>
+										<option value="ut">Utah (UT)</option>
+										<option value="vt">Vermont (VT)</option>
+										<option value="va">Virginia (VA)</option>
+										<option value="wa">Washington (WA)</option>
+										<option value="wv">West Virginia (WV)</option>
+										<option value="wi">Wisconsin (WI)</option>
+										<option value="wy">Wyoming (WY)</option>
+									</select>          
+									<p class="help-block"></p>
+								</div>
+							</div>
+							<!-- zip-code input-->
+							<div class="form-group">
+								<label class="col-sm-2 control-label" for="attachZipcode" required>zip code</label>
+								<div class="col-sm-10">
+									<input class="form-control" placeholder="Zip Code" pattern="[0-9]{5}" type="text" name="attachZipcode" id="attachZipcode" required/>
+									<p class="help-block">Enter the 5-digit Zip Code (For ex. 18104)</p>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-offset-2 col-sm-10">
+									<button type="submit" class="attach-new-location btn btn-warning" id="attach-new-location">Attach New Location</button>
 								</div>
 							</div>
 						</form>
