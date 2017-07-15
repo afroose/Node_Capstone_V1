@@ -5,7 +5,6 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 const cookieParser = require('cookie-parser');
 const expressValidator = require('express-validator');
-const flash = require('connect-flash'); // test messages
 
 // Call routers - 
 const loginRouter = require('./routes/loginRouter');
