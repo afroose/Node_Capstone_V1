@@ -123,7 +123,7 @@
 											</div>
 											<div class="panel-body"> 
 												<form class="js-search-form">
-													<input class="form-control" placeholder="Enter Description" type="text" data-id="" name="dishDescription" id="dishDescription" required/>
+													<input class="form-control" placeholder="Enter Description" type="text" id="${val.dishes[0]._id}" name="dishDescription" required value="${val.dishes[0].dishDescription}"/>
 												</form>
 											</div>
 											<div class="panel-footer">
@@ -176,10 +176,12 @@
 					$("#location").val(`${data.locationName}`);
 					if (data.locationName === "Other location" ) {
 						console.log("Change location");
-						$('#attachLocationModal .modal-header button').hide();
-						$('#attachLocationModal .modal-footer button').hide();
-						$('#attachLocationModal').modal('toggle');
-						$("#attachLocationModal .alert-warning").prepend('<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><p>You have not selected/created a valid location. Please create a new location. You will be able to create the menu associated with that location afterwards.</p>').toggle();
+						$('#createLocationModal .modal-header button').hide();
+						$('#createLocationModal .modal-footer button').hide();
+						$("#createLocationModal").find("#submit-new-location").toggleClass('submit-new-location attach-new-location'); 
+						$("#createLocationModal").attr("data-backdrop","static").attr("data-keyboard","false");
+						$('#createLocationModal').modal('toggle');
+						$("#createLocationModal .alert-warning").prepend('<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><p>You have not selected/created a valid location. Please create a new location. You will be able to create the menu associated with that location afterwards.</p>').toggle();
 					};
         },
         error:function(){
@@ -211,7 +213,7 @@
 			RenderUserData(findUser);
 
 			// Re-render page when location is changed
-			$('body').on('change','#location select',function (event) {
+			$('body').on('change','#location',function (event) {
 				console.log($(this).val());
 				$.ajax({
 					url: `/location/Name/${$(this).val()}`,
@@ -235,10 +237,10 @@
 			// Edit Dish description
 			$('body').on('click', '.submit-dish-description', function(event){
 				event.preventDefault();
-				var descriptionToPass = $('#dishDescription').val();          
-				console.log("Dish description: ", descriptionToPass);
 				var dishToPass = $(this).data('id');
 				console.log("Dish ID: ",dishToPass);
+				var descriptionToPass = $(`#${dishToPass}`).val();          
+				console.log("Dish description: ", descriptionToPass);
 				$.ajax({
 					url: `/dish/${dishToPass}`,
 					type: 'PUT',
@@ -275,7 +277,8 @@
 			});
 
 			// Create New Location
-			$('body').on('click', '.submit-new-location', function(event){
+			
+			function newLocation() {
 				event.preventDefault();
 				var nameToPass = $('#newLocationName').val(); 
 				console.log("Location Name: ",nameToPass);
@@ -298,20 +301,45 @@
 					success:function(data){
 						console.log(data);
 					}
-				})
+				})				
+			}
+
+			$('body').on('click', '.submit-new-location', function(event){
+				alert("added location");
+				newLocation();
 				$('#createLocationModal').modal('toggle');
 			});
 
 			// Attach New Location
-			$('body').on('click', '#attach-new-location', function(event){
+
+			function attachLocation(locationIdToPass) {		
+				// user id
+				console.log("User to attach location to: ", findUser);
+				// Attach new location to user        
+				console.log("New location to attach: ", locationIdToPass);
+				$.ajax({
+					url: `/${findUser}`,
+					type: 'PUT',
+					data: {
+						id: findUser,
+						location_id: locationIdToPass
+					},
+					success:function(data){
+						console.log(data);
+					}
+				})
+			}
+
+			$('body').on('click', '.attach-new-location', function(event){
+				alert("attach location");
 				event.preventDefault();
-				var nameToPass = $('#attachLocationName').val(); 
+				var nameToPass = $('#newLocationName').val(); 
 				console.log("Location Name: ",nameToPass);
-				var street = $('#attachStreet').val();
-				var building = $('#attachBuilding').val();
-				var city = $('#attachCity').val();
-				var state = $('#attachState').val();
-				var zipcode = $('#attachZipcode').val();
+				var street = $('#street').val();
+				var building = $('#building').val();
+				var city = $('#city').val();
+				var state = $('#state').val();
+				var zipcode = $('#zipcode').val();
 				$.ajax({
 					url: `/location`,
 					type: 'POST',
@@ -325,26 +353,16 @@
 					},
 					success:function(data){
 						console.log(data.id);
+						attachLocation(data.id);
 					}
-				})
-				// user id
-				console.log(findUser);
-				// Attach new location to user
-				var locationIdToPass = data.id;          
-				console.log("New location to attach: ", data.id);
-				$.ajax({
-					url: `/dish/${finduser}`,
-					type: 'PUT',
-					data: {
-						id: finduser,
-						locationIid: locationIdToPass
-					},
-					success:function(data){
-						console.log(data);
-					}
-				})
-				// Rrender page
-				$('#attachLocationModal').modal('hide');
+				})	
+				// Render page
+				$('#createLocationModal').modal('toggle');
+				$('#createLocationModal .modal-header button').show();
+				$('#createLocationModal .modal-footer button').show();
+				$("#createLocationModal").find("#submit-new-location").toggleClass('attach-new-location submit-new-location ');
+				$("#createLocationModal .alert-warning").empty();
+				$("#createLocationModal").attr("data-backdrop","true").attr("data-keyboard","true");
 			});
 
 			// Create new menu entry
@@ -450,7 +468,7 @@
 						<header class="location-name"></header>
 
 						<div class="dish-result-container">
-							<div class="dish-result">	
+							<div class="dish-result row">	
 							</div>
 						</div>
 						<div class='error'></div>
@@ -509,7 +527,7 @@
 		</div>
 
 		<!-- Modal - Create New Location -->
-		<div class="modal fade" id="createLocationModal" tabindex="-1" role="dialog" aria-labelledby="createLocationModal" aria-hidden="true">
+		<div class="modal fade" id="createLocationModal" tabindex="-1" role="dialog" aria-labelledby="createLocationModal" aria-hidden="true" data-backdrop="true" data-keyboard="true">
 			<div class="modal-dialog">
 				<div class="modal-content">    
 					<div class="alert alert-warning">
