@@ -9,7 +9,7 @@ const should = chai.should();
 
 const {locationId} = require('../models/locationModels');
 const {app, runServer, closeServer} = require('../server');
-const {TEST_DATABASE_URL} = require('../config');
+const {TEST_DATABASE_URL} = require('../config/config');
 
 chai.use(chaiHttp);
 
