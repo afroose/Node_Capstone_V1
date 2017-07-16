@@ -26,7 +26,7 @@ function seedLocationData() {
     seedData.push(generateLocationData());
   }
   // this will return a promise
-  return Location.insertMany(seedData);
+  return locationId.insertMany(seedData);
 }
 
 // used to generate data to put in db
