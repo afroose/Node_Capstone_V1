@@ -17,7 +17,7 @@ describe('index',function() {
     return closeServer();
   });
 
-  it('test index.html - Ateev', function() {
+  it('Should return index page', function() {
     return chai.request(app)
       .get('/')
       .then(function(res) {
