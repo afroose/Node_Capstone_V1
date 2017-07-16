@@ -41,7 +41,7 @@ function generateLocationName() {
 // or request.body data
 function generateLocationData() {
   return {
-    LocationName: generateLocationNameName(),
+    LocationName: generateLocationName(),
     address: {
       city: faker.address.city(),
       street: faker.address.streetName(),
