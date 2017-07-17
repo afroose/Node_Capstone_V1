@@ -25,15 +25,17 @@ function seedLocationData() {
   for (let i=1; i<=10; i++) {
     seedData.push(generateLocationData());
   }
+  console.log("hello test data")
+  console.log(seedData)
   // this will return a promise
   return locationId.insertMany(seedData);
 }
 
 // used to generate data to put in db
 function generateLocationName() {
-  const LocationName = [
+  const locationName = [
     'Manhattan', 'Queens', 'Brooklyn', 'Bronx', 'Staten Island'];
-  return LocationName[Math.floor(Math.random() * LocationName.length)];
+  return locationName[Math.floor(Math.random() * locationName.length)];
 }
 
 // generate an object represnting a restaurant.
@@ -41,7 +43,7 @@ function generateLocationName() {
 // or request.body data
 function generateLocationData() {
   return {
-    LocationName: generateLocationName(),
+    locationName: generateLocationName(),
     address: {
       city: faker.address.city(),
       street: faker.address.streetName(),
@@ -58,7 +60,7 @@ function generateLocationData() {
 // around for next one
 function tearDownDb() {
     console.warn('Deleting database');
-    return mongoose.connection.dropDatabase();
+    // return mongoose.connection.dropDatabase();
 }
 
 describe('Locations API resource', function() {
@@ -68,10 +70,12 @@ describe('Locations API resource', function() {
   // `seedRestaurantData` and `tearDownDb` each return a promise,
   // so we return the value returned by these function calls.
   before(function() {
+    console.log("test database" + TEST_DATABASE_URL)
     return runServer(TEST_DATABASE_URL);
   });
 
   beforeEach(function() {
+    console.log("Create seed data start");
     return seedLocationData();
   });
 
@@ -129,16 +133,16 @@ describe('Locations API resource', function() {
           res.body.locations.forEach(function(location) {
             location.should.be.a('object');
             location.should.include.keys(
-              'id', 'name', 'address');
+              'id', 'locationName', 'address');
           });
           reslocationId = res.body.locations[0];
-          return locationID.findById(reslocationId.id);
+          return locationId.findById(reslocationId.id);
         })
         .then(function(location) {
 
           reslocationId.id.should.equal(location.id);
-          reslocationId.name.should.equal(location.name);
-          reslocationId.address.should.contain(location.address.building);
+          reslocationId.locationName.should.equal(location.locationName);
+          reslocationId.address.should.contain(location.address.street);
         });
     });
   });
