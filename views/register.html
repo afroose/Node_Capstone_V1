@@ -17,6 +17,10 @@
 			src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
 			integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
 			crossorigin="anonymous"></script>
+		<script 
+			src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" 
+			integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" 
+			crossorigin="anonymous"></script>
 			
 		<script>	
 		
@@ -92,6 +96,17 @@
 		<div class="container">
 			<div class="col-sm-6 col-sm-offset-3">
 
+				<div class="panel panel-primary info">
+					<div class="panel-heading">
+						<h1>Important for registration</h1>
+					</div>
+					<div class="panel-body"> 
+						<p>When signing up, you must select a location, that will be attached to your profile as the primary location.</p>
+						<p>That location will drive the menu selection on subsequent pages.</p>
+						<p>If you cannot find a location in the drop down menu, please select "Other Location". After signing up, you will be prompted to create a new location, for which you will be able to create a new menu, and attach new dishes to that menu.<br/> The new location and menus will be available to new users after you create it.</p>
+					</div>
+				</div>
+
 				<!-- REGISTER FORM -->
 				<form action="/register" method="post" class="js-register-form">
 					<h1><span class="fa fa-sign-in"></span> Signup</h1>
@@ -120,18 +135,13 @@
 					<div class="form-group">
 						<label for="location" required>Location</label>
 						<select class="form-control" name="location" id="location" value="">
-							<option selected value="base">Please Select</option>
+							<option selected disabled value="base">Please Select</option>
 						</select>
 					</div>
           <div class='error'></div>
 
 					<button type="submit" class="btn btn-warning btn-lg">Signup</button>
 				</form>
-
-				<hr>
-
-				<p>Already have an account? <a href="/login">Login</a></p>
-				<p>Or go <a href="/">home</a>.</p>
 
 			</div>
 		</div>

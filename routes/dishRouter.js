@@ -45,21 +45,37 @@ router.post('/', (req, res) => {
     }
   }
 
-  dishId
-    .create({
-      dishName: req.body.dishName,
-      dishDescription: req.body.dishDescription
-    })
-    .then(
-      console.log(req.body.dishName)
-    )
-    .then(
-        dishes => res.status(201).json(dishes)
-    )
-    .catch(err => {
-        console.error(err);
-        res.status(500).json({error: 'Something went wrong'});
-    });
+  let {dishName, dishDescription} = req.body;
+  // dishId
+  //   .find({dishName}) // find dish 
+  //   .count() // count > 0 if exists
+  //   .exec()
+  //   .then(count => {
+  //       if (count > 0) { // if dish exists - close
+  //           console.log("already exist");
+  //           const message = `This dish is already in the database`
+  //           return res.status(409).send(message);
+  //       }
+  //   })
+  //   .then(
+  //     newDish => {
+        dishId
+        .create({
+          dishName: req.body.dishName,
+          dishDescription: req.body.dishDescription
+        })
+        .then(
+          console.log(req.body.dishName)
+        )
+        .then(
+            dishes => res.status(201).json(dishes)
+        )
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({error: 'Something went wrong'});
+        });
+    //   }
+    // )
 });
 
 // PUT endpoint - 1 updateable field - description - example: http://localhost:8080/dish/593875abd0db4334c433cbd7

@@ -95,45 +95,62 @@
 			$('.location-name').empty();
 			$('.dish-result').empty();
 			$.ajax({
+				url: `/location/Filter/${locationId}`,
+				dataType:'JSON',
+				success:function(data){
+					console.log(`Location for location box: ${data.locationName}`);
+					$('.location-name').prepend(`<h1><span class="fa fa-list"></span> Available dishes for ${data.locationName}</h1>`);  
+					$("#location").val(`${data.locationName}`);
+				},
+				error:function(){      }
+			});
+			$.ajax({
 				url: `/menu/dish?location=${locationId}`,
 				dataType:'JSON',
 				success:function(data){
-					console.log(data.keys.length);
+					console.log(data.length);
+					if (data.length === 0 ) {
+						$("#no-menu").prepend(`<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+							<p>There are no menus assigned to this location yet. To create a new menu, click "Add Dishes to Menu" and compose a new menu from the available dishes.</p>`).toggle();
+					};
 					let formattedTextElement = '';
 					let resultElement = '';
 					$.each(data, function(key, val){
 						console.log(key); 
-						if (key === 0) $('.location-name').prepend(`<h1><span class="fa fa-list"></span> Available dishes for ${val.location[0].locationName}</h1>`);  
-						$("#location").val(`${val.location[0].locationName}`);
-						resultElement += `
-							<div class="col-md-6">
-								<div class="panel panel-default dish-panel">
-									<div class="panel-heading">
-										${val.dishes[0].dishName}
-									</div>
-									<div class="panel-body"> 
-										${val.dishes[0].dishDescription}
-									</div>
-									<div class="panel-footer">
-										<button class="edit-dish-button btn btn-primary" data-id="${val.dishes[0]._id}">Edit dish description</button>
-										
-										<div class="edit-dish-input panel panel-info dish-panel" style="display: none">
-											<div class="panel-heading">
-												Edit Dish Description
-											</div>
-											<div class="panel-body"> 
-												<form class="js-search-form">
-													<input class="form-control" placeholder="Enter Description" type="text" id="${val.dishes[0]._id}" name="dishDescription" required value="${val.dishes[0].dishDescription}"/>
-												</form>
-											</div>
-											<div class="panel-footer">
-												<button class="submit-dish-description btn btn-info" data-id="${val.dishes[0]._id}">Submit dish description</button>
-											</div>
-										</div>	
-									</div>
-								</div>			
-							</div>
-						`; 	
+						console.log(val); 
+						console.log(`Length of dishes ${val.dishes.length}`); 
+						for ( i = 0; i < val.dishes.length; i++) {
+							console.log("Dishes: ",val.dishes[i].dishName);
+							resultElement += `
+								<div class="col-md-6">
+									<div class="panel panel-default dish-panel">
+										<div class="panel-heading">
+											${val.dishes[i].dishName}
+										</div>
+										<div class="panel-body"> 
+											${val.dishes[i].dishDescription}
+										</div>
+										<div class="panel-footer">
+											<button class="edit-dish-button btn btn-primary" data-id="${val.dishes[i]._id}">Edit dish description</button>
+											
+											<div class="edit-dish-input panel panel-info dish-panel" style="display: none">
+												<div class="panel-heading">
+													Edit Dish Description
+												</div>
+												<div class="panel-body"> 
+													<form class="js-search-form">
+														<input class="form-control" placeholder="Enter Description" type="text" id="${val.dishes[i]._id}" name="dishDescription" required value="${val.dishes[i].dishDescription}"/>
+													</form>
+												</div>
+												<div class="panel-footer">
+													<button class="submit-dish-description btn btn-info" data-id="${val.dishes[i]._id}">Submit dish description</button>
+												</div>
+											</div>	
+										</div>
+									</div>			
+								</div>
+							`; 	
+						}
 					})
 					$('.dish-result').prepend(`${resultElement}`); 
 				},
@@ -181,7 +198,8 @@
 						$("#createLocationModal").find("#submit-new-location").toggleClass('submit-new-location attach-new-location'); 
 						$("#createLocationModal").attr("data-backdrop","static").attr("data-keyboard","false");
 						$('#createLocationModal').modal('toggle');
-						$("#createLocationModal .alert-warning").prepend('<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><p>You have not selected/created a valid location. Please create a new location. You will be able to create the menu associated with that location afterwards.</p>').toggle();
+						$("#createLocationModal .alert-warning").prepend(`<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+							<p>You selected "Other Location" when you signed-up.</p><p>Please create a new location. This will become your default location. You will be able to create the menu associated with this location, and assign dishes to that menu.</p>`).toggle();
 					};
         },
         error:function(){
@@ -305,7 +323,7 @@
 			}
 
 			$('body').on('click', '.submit-new-location', function(event){
-				alert("added location");
+				// alert("added location");
 				newLocation();
 				$('#createLocationModal').modal('toggle');
 			});
@@ -331,7 +349,7 @@
 			}
 
 			$('body').on('click', '.attach-new-location', function(event){
-				alert("attach location");
+				//alert("attach location");
 				event.preventDefault();
 				var nameToPass = $('#newLocationName').val(); 
 				console.log("Location Name: ",nameToPass);
@@ -411,7 +429,7 @@
 					url: '/dish',
 					dataType:'JSON',
 					success:function(data){
-						$select.html('');
+						//$select.html('');
 						// iterate over the data and append a select option
 						$.each(data, function(key, val){
 							console.log(val);
@@ -428,7 +446,12 @@
             event.preventDefault();
             var locationToPass = $('#menuLocation').data('id');          
             console.log("location ID: ", locationToPass);
-            var dishToPass = $('#menuDishes>option:selected').data('id');
+            // var dishToPass = $('#menuDishes>option:selected').data('id');
+						var dishToPass = [];
+						$('#menuDishes>option:selected').each(function() {
+							if ($(this).data('id') != null) dishToPass.push($(this).data('id'));
+						})
+            //var dishToPass = $('#menuDishes').serialize();
             console.log("Dish ID: ",dishToPass);
 						$.ajax({
 							url: '/menu',
@@ -442,11 +465,13 @@
 							}
 						})
 					$('#createMenuModal').modal('toggle');
+					renderLocationData($('#location>option:selected').data('id'));
 				});
 
 
 			});
 
+			$('[data-toggle="tooltip"]').tooltip()
 
     } ); 
     </script>
@@ -463,7 +488,7 @@
 							<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
 								<strong>Successfully submitted!</strong> The form is valid.
 						</div>    
-						<div class="alert alert-warning">
+						<div class="alert alert-warning" id="no-menu">
 						</div>
 						<header class="location-name"></header>
 
@@ -477,7 +502,7 @@
               <div class="form-group">
                 <a href="#" data-toggle="modal" data-target="#createDishModal">Add Dishes</a> | 
 								<a href="#" data-toggle="modal" data-target="#createLocationModal">Add Locations</a> | 
-								<a href="#" id="openMenuModal">Add Dishes to Menu</a>
+								<a href="#" id="openMenuModal" data-toggle="tooltip" data-placement="top" title="You can add dishes to an existing menu, or create a menu for a new location">Add Dishes to Menu</a>
               </div>
 					</div>
 				</div>
@@ -681,8 +706,8 @@
               <div class="form-group">
                 <label class="col-sm-2 control-label" for="menuDishes" required>Dish Name</label>
 								<div class="col-sm-10">
-									<select class="form-control" placeholder="Dish Name" type="text" name="menuDishes" id="menuDishes" required/>
-										<option selected value="base">Please Select</option>
+									<select class="form-control" placeholder="Dish Name" type="text" name="menuDishes" id="menuDishes" multiple="multiple" required/>
+										<option disabled value="base">Please Select</option>
 									</select>
 								</div>
               </div>

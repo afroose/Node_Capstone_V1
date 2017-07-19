@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-	<title>Node Authentication</title>
+	<title>Menu Finder</title>
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
 	<style>
@@ -9,17 +9,31 @@
 	</style>
 </head>
 <body>
-<div class="container">
-
-	<div class="jumbotron text-center">
-		<h1><span class="fa fa-lock"></span> Node Authentication</h1>
-
-		<p>Login or Register with:</p>
-
-		<a href="/login" class="btn btn-default"><span class="fa fa-user"></span> Local Login</a>
-		<a href="/register" class="btn btn-default"><span class="fa fa-user"></span> Local Signup</a>
+<div class="container jumbotron">
+	<div class="panel panel-primary">
+		<div class="panel-heading">
+			<h1>Welcome to the Menu Finder</h1>
+		</div>
+		<div class="panel-body"> 
+			<p>The menu Finder is intended to be the foundation for a larger project. The goal is to create an interface that enables users to:</p>
+				<ul>
+					<li>Find menus at specific locations,</li>
+					<li>Add dishes to the database,</li>
+					<li>Add dishes to the menus for specific locations,</li>
+					<li>Create new locations</li>
+				</ul>
+			<p>As the program grows, I aim to cretae an app where end users can search locations for the menus of the day, and where owners can edit the menus. Dish descriptions and ingredients will also be available.</p>
+		</div>
+		<div class="panel-footer">
+			<h3>Enjoy...</h3>
+		</div>
 	</div>
-
+	<div class="jumbotron text-center">
+		<h1><span class="fa fa-lock"></span> Sign-Up</h1>
+		<p>Login or Register with:</p>
+		<a href="/login" class="btn btn-warning btn-lg"><span class="fa fa-user"></span> Login</a>
+		<a href="/register" class="btn btn-warning btn-lg"><span class="fa fa-user"></span> Register</a>
+	</div>
 </div>
 </body>
 </html>
