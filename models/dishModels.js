@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 // this is our schema to represent a dish in the menus
 const dishSchema = mongoose.Schema({
-  dishName: {type: String, required: true},
+  dishName: {type: String, required: true, unique: true},
   dishDescription: {type: String}
 });
 

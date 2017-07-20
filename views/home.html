@@ -72,6 +72,7 @@
 					console.log(`Location: ${data.location_id}`);
 					let findLocation = data.location_id;
 					let userName = data.name.firstName; 
+					$('#welcome').empty();
 					$('#welcome').prepend(`								
 						<form class="form-inline">
 							<div class="form-group">
@@ -83,6 +84,7 @@
 							</div>
 						</form>					
 					`);
+					clearAlerts();
 					renderList();
 					filterOtherLocation(findLocation);
 					renderLocationData(findLocation);
@@ -90,6 +92,12 @@
 				error:function(){      }
 			});
 		};
+
+		function clearAlerts() {
+			$('#no-menu').toggle(false);
+			$('#new-item-alert').toggle(false);
+			$('#alert-location').toggle(false);
+		}
 
 		function renderLocationData(locationId) {
 			$('.location-name').empty();
@@ -110,8 +118,9 @@
 				success:function(data){
 					console.log(data.length);
 					if (data.length === 0 ) {
+						$("#no-menu").empty();
 						$("#no-menu").prepend(`<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-							<p>There are no menus assigned to this location yet. To create a new menu, click "Add Dishes to Menu" and compose a new menu from the available dishes.</p>`).toggle();
+							<p>There are no menus assigned to this location yet. To create a new menu, click "Add Dishes to Menu" and compose a new menu from the available dishes.</p>`).show();
 					};
 					let formattedTextElement = '';
 					let resultElement = '';
@@ -191,14 +200,14 @@
         success:function(data){
 					console.log(`Location: ${data.locationName}`);
 					$("#location").val(`${data.locationName}`);
-					if (data.locationName === "Other location" ) {
+					if (data.locationName === "Other Location" ) {
 						console.log("Change location");
 						$('#createLocationModal .modal-header button').hide();
 						$('#createLocationModal .modal-footer button').hide();
 						$("#createLocationModal").find("#submit-new-location").toggleClass('submit-new-location attach-new-location'); 
 						$("#createLocationModal").attr("data-backdrop","static").attr("data-keyboard","false");
 						$('#createLocationModal').modal('toggle');
-						$("#createLocationModal .alert-warning").prepend(`<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+						$("#alert-location").prepend(`<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
 							<p>You selected "Other Location" when you signed-up.</p><p>Please create a new location. This will become your default location. You will be able to create the menu associated with this location, and assign dishes to that menu.</p>`).toggle();
 					};
         },
@@ -233,6 +242,7 @@
 			// Re-render page when location is changed
 			$('body').on('change','#location',function (event) {
 				console.log($(this).val());
+				clearAlerts();
 				$.ajax({
 					url: `/location/Name/${$(this).val()}`,
 					dataType:'JSON',
@@ -323,9 +333,14 @@
 			}
 
 			$('body').on('click', '.submit-new-location', function(event){
-				// alert("added location");
+				event.preventDefault();
+				// alert(findUser);
 				newLocation();
 				$('#createLocationModal').modal('toggle');
+				RenderUserData(findUser);
+				// alert("New Location");
+				$("#new-item-alert").prepend(`<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+					<p>The location has been successfully added, you can select it in the drop-down above.</p>`).toggle();
 			});
 
 			// Attach New Location
@@ -344,6 +359,9 @@
 					},
 					success:function(data){
 						console.log(data);
+						// RenderUserData(findUser);
+						renderList();
+						renderLocationData(locationIdToPass);
 					}
 				})
 			}
@@ -379,15 +397,18 @@
 				$('#createLocationModal .modal-header button').show();
 				$('#createLocationModal .modal-footer button').show();
 				$("#createLocationModal").find("#submit-new-location").toggleClass('attach-new-location submit-new-location ');
-				$("#createLocationModal .alert-warning").empty();
+				$("#alert-location").empty();
+				$("#alert-location").toggle();
 				$("#createLocationModal").attr("data-backdrop","true").attr("data-keyboard","true");
+				clearAlerts();
 			});
 
 			// Create new menu entry
 			$('body').on('click', '#openMenuModal', function(event){
 				event.preventDefault();
+
 				$('#createMenuModal').modal('toggle')
-  
+				if ($('#no-menu').css('visibility','visible')) {$('#no-menu').toggle();};
 				$( "#menuLocation" ).autocomplete({
 					source: function( request, response ) {
 						$.ajax( {
@@ -465,7 +486,8 @@
 							}
 						})
 					$('#createMenuModal').modal('toggle');
-					renderLocationData($('#location>option:selected').data('id'));
+					clearAlerts();
+					renderLocationData(locationToPass);
 				});
 
 
@@ -484,9 +506,7 @@
 					<div class="panel-heading" id="welcome">
 					</div>
     			<div class="panel-body">      
-						<div class="alert alert-success">
-							<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-								<strong>Successfully submitted!</strong> The form is valid.
+						<div class="alert alert-success" id="new-item-alert">
 						</div>    
 						<div class="alert alert-warning" id="no-menu">
 						</div>
@@ -555,7 +575,7 @@
 		<div class="modal fade" id="createLocationModal" tabindex="-1" role="dialog" aria-labelledby="createLocationModal" aria-hidden="true" data-backdrop="true" data-keyboard="true">
 			<div class="modal-dialog">
 				<div class="modal-content">    
-					<div class="alert alert-warning">
+					<div class="alert alert-warning" id="alert-location">
 					</div>
 					<!-- Modal Header -->
 					<div class="modal-header">
