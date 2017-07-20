@@ -124,10 +124,19 @@
 					};
 					let formattedTextElement = '';
 					let resultElement = '';
+						let menuDay = 0;
 					$.each(data, function(key, val){
 						console.log(key); 
 						console.log(val); 
+						menuDay++;
 						console.log(`Length of dishes ${val.dishes.length}`); 
+						resultElement += `
+							<div class="col-md-12">
+								<div class="panel panel-default dish-panel">
+									<div class="panel-heading">
+										<h3>Menu Day ${menuDay}
+									</div>
+									<div class="panel-body">`
 						for ( i = 0; i < val.dishes.length; i++) {
 							console.log("Dishes: ",val.dishes[i].dishName);
 							resultElement += `
@@ -159,7 +168,8 @@
 									</div>			
 								</div>
 							`; 	
-						}
+						}						
+						resultElement += `</div></div></div>`
 					})
 					$('.dish-result').prepend(`${resultElement}`); 
 				},
